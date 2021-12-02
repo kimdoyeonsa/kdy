@@ -1,0 +1,24 @@
+Author: Vicențiu Ciorbaru <vicentiu@mariadb.org>
+Date:   Fri Dec 21 19:14:04 2018 +0200
+
+   Link with libatomic to enable C11 atomics support
+
+   Some architectures (mips) require libatomic to support proper
+   atomic operations. Check first if support is available without
+   linking, otherwise use the library.
+
+
+--- a/sql/CMakeLists.txt
++++ b/sql/CMakeLists.txt
+@@ -328,6 +328,11 @@
+      "${MYSQLD_LINK_FLAGS} ${WITH_MYSQLD_LDFLAGS}")
+ ENDIF()
+ 
++IF (HAVE_GCC_C11_ATOMICS_WITH_LIBATOMIC)
++  TARGET_LINK_LIBRARIES(sql atomic)
++ENDIF()
++
++ FIND_PACKAGE(BISON 2.0)
+ 
+ # Handle out-of-source build from source package with possibly broken
+ # bison. Copy bison output to from source to build directory, if not already

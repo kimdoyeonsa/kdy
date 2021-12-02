@@ -1,0 +1,74 @@
+--- a/php.ini-production	2021-11-17 03:07:21.000000000 +0900
++++ b/php.ini-production	2021-12-02 11:06:52.724615732 +0900
+@@ -500,7 +500,7 @@
+ ; Development Value: On
+ ; Production Value: Off
+ ; http://php.net/display-errors
+-display_errors = Off
++display_errors = On
+ 
+ ; The display of errors which occur during PHP's startup sequence are handled
+ ; separately from display_errors. We strongly recommend you set this to 'off'
+@@ -519,7 +519,7 @@
+ ; Development Value: On
+ ; Production Value: On
+ ; http://php.net/log-errors
+-log_errors = On
++log_errors = Off
+ 
+ ; Set maximum length of log_errors. In error_log information about the source is
+ ; added. The default is 1024 and 0 allows to not apply any maximum length at all.
+@@ -677,7 +677,7 @@
+ ; Development Value: Off
+ ; Production Value: Off
+ ; http://php.net/register-argc-argv
+-register_argc_argv = Off
++register_argc_argv = On
+ 
+ ; When enabled, the ENV, REQUEST and SERVER variables are created when they're
+ ; first used (Just In Time) instead of when the script starts. If these
+@@ -756,7 +756,7 @@
+ ; see documentation for security issues.  The alternate is to use the
+ ; cgi.force_redirect configuration below
+ ; http://php.net/doc-root
+-doc_root =
++doc_root = "/opt/share/www"
+ 
+ ; The directory under which PHP opens the script using /~username used only
+ ; if nonempty.
+@@ -767,7 +767,7 @@
+ ; http://php.net/extension-dir
+ ;extension_dir = "./"
+ ; On windows:
+-;extension_dir = "ext"
++extension_dir = "/opt/lib/php8"
+ 
+ ; Directory where the temporary files should be placed.
+ ; Defaults to the system default (see sys_get_temp_dir)
+@@ -777,7 +777,7 @@
+ ; properly in multithreaded servers, such as IIS or Zeus, and is automatically
+ ; disabled on them.
+ ; http://php.net/enable-dl
+-enable_dl = Off
++enable_dl = On
+ 
+ ; cgi.force_redirect is necessary to provide security running PHP as a CGI under
+ ; most web servers.  Left undefined, PHP turns this on by default.  You can
+@@ -804,7 +804,7 @@
+ ; of zero causes PHP to behave as before.  Default is 1.  You should fix your scripts
+ ; to use SCRIPT_FILENAME rather than PATH_TRANSLATED.
+ ; http://php.net/cgi.fix-pathinfo
+-;cgi.fix_pathinfo=1
++cgi.fix_pathinfo=1
+ 
+ ; if cgi.discard_path is enabled, the PHP CGI binary can safely be placed outside
+ ; of the web tree and people will not be able to circumvent .htaccess security.
+@@ -848,7 +848,7 @@
+ ; Temporary directory for HTTP uploaded files (will use system default if not
+ ; specified).
+ ; http://php.net/upload-tmp-dir
+-;upload_tmp_dir =
++upload_tmp_dir = "/opt/tmp/upload"
+ 
+ ; Maximum allowed size for uploaded files.
+ ; http://php.net/upload-max-filesize
