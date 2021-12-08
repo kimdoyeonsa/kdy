@@ -4,7 +4,7 @@
 #
 
 define Package/php81-pecl/Default
-  SUBMENU:=php81
+  SUBMENU:=PHP81
   SECTION:=lang
   CATEGORY:=Languages
   URL:=http://pecl.php.net/
@@ -27,7 +27,7 @@ CONFIGURE_VARS+= \
 CONFIGURE_ARGS+= \
 	--with-php-config=$(STAGING_DIR)/opt/bin/php81-config
 
-define php81PECLPackage
+define PHP81PECLPackage
 
   define Package/php81-pecl-$(1)
     $(call Package/php81-pecl/Default)

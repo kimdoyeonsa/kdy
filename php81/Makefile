@@ -40,13 +40,13 @@ php81_MODULES= \
 
 PKG_CONFIG_DEPENDS:= \
 	$(patsubst %,CONFIG_PACKAGE_php81-mod-%,$(php81_MODULES)) \
-	CONFIG_php81_LIBXML CONFIG_php81_SYSTEMTZDATA
+	CONFIG_php81_LIBXML CONFIG_php81_SYSTEMTZDATA CONFIG_PACKAGE_php81-apache
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 
 define Package/php81/Default
-  SUBMENU:=php81
+  SUBMENU:=PHP81
   SECTION:=lang
   CATEGORY:=Languages
   TITLE:=php81 Hypertext preprocessor
@@ -91,6 +91,12 @@ define Package/php81/description
 
   Please note, that installing php5 and php81 in parallel on the same target
   is not supported in OpenWrt/LEDE/Entware.
+endef
+
+define Package/php81-dev
+  $(call Package/php81/Default)
+  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma
+  TITLE+= (dev)
 endef
 
 define Package/php81-cli
@@ -169,6 +175,19 @@ define Package/php81-mod-intl/description
   However, the data is required to make the ICU library useful - and thus
   directly affects PHPs ICU extension, too - so consider to also
   select/install package 'icu-full-data'.
+endef
+
+define Package/php81-apache
+  $(call Package/php81/Default)
+  DEPENDS+=PACKAGE_php81-apache:apache \
+	   +PACKAGE_php81-mod-intl:libstdcpp \
+	   +libpcre2 +zlib
+  TITLE:=PHP8 module for Apache Web Server
+endef
+
+define Package/php81-apache/description
+  $(call Package/php81/Default/description)
+  This package contains the PHP module for the Apache Web Server.
 endef
 
 # not everything groks --disable-nls
@@ -570,6 +589,30 @@ define Package/php81/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/php.ini $(1)/opt/etc
 endef
 
+define Package/php81-dev/install
+	$(INSTALL_DIR) $(1)/opt/bin
+	$(INSTALL_DIR) $(1)/opt/include
+	$(INSTALL_DIR) $(1)/opt/lib
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(1)/opt/bin/phpize81
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(1)/opt/bin/php81-config
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php81
+	sed -i -e "s#prefix='/opt'#prefix='/opt'#" $(1)/opt/bin/phpize81
+	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='/opt'#" $(1)/opt/bin/phpize81
+	sed -i -e "s#/include\`/php\"#/include\`/php81\"#" $(1)/opt/bin/phpize81
+	sed -i -e "s#/lib/php\`/build\"#/lib/php81\`/build\"#" $(1)/opt/bin/phpize81
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/phpize81
+	sed -i -e "s#prefix=\"/opt\"#prefix=\"/opt\"#" $(1)/opt/bin/php81-config
+	sed -i -e "s#/include/php\"#/include/php81\"#" $(1)/opt/bin/php81-config
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/php81-config
+#	sed -i -e "s#$(STAGING_DIR)/opt/lib#/opt/lib#" $(1)/opt/bin/php81-config
+endef
+
+define Package/php81-apache/install
+	$(INSTALL_DIR) $(1)/opt/lib/apache2
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libs/libphp.so $(1)/opt/lib/apache2
+endef
+
 
 define Package/php81-cli/install
 	$(INSTALL_DIR) $(1)/opt/bin
@@ -646,10 +689,10 @@ define Build/InstallDev
 	make -C $(PKG_BUILD_DIR) install INSTALL_ROOT=$(PKG_BUILD_DIR)/staging
 	rm -rf $(PKG_BUILD_DIR)/staging/opt/{share,man,sbin}
 	rm -f $(PKG_BUILD_DIR)/staging/opt/bin/{php,php-cgi,php-cli}
-	mv $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(PKG_BUILD_DIR)/staging/opt/bin/phpize81
-	mv $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php81-config
-	mv $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php81
-	mv $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php81
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(PKG_BUILD_DIR)/staging/opt/bin/phpize81
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php81-config
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php81
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php81
 
 	$(CP) $(PKG_BUILD_DIR)/staging/opt $(STAGING_DIR)/
 
@@ -695,10 +738,12 @@ $(eval $(call BuildPackage,php81))
 $(eval $(call BuildPackage,php81-cgi))
 $(eval $(call BuildPackage,php81-cli))
 $(eval $(call BuildPackage,php81-dbg))
+$(eval $(call BuildPackage,php81-dev))
 $(eval $(call BuildPackage,php81-embed))
 $(eval $(call BuildPackage,php81-fastcgi))
 $(eval $(call BuildPackage,php81-fpm))
 $(eval $(call BuildPackage,php81-litespeed))
+$(eval $(call BuildPackage,php81-apache))
 
 #$(eval $(call BuildModule,NAME,TITLE[,PKG DEPENDS]))
 $(eval $(call BuildModule,tidy,TIDY,+PACKAGE_php81-mod-tidy:libtidy))
