@@ -40,7 +40,7 @@ PHP8_MODULES= \
 
 PKG_CONFIG_DEPENDS:= \
 	$(patsubst %,CONFIG_PACKAGE_php8-mod-%,$(PHP8_MODULES)) \
-	CONFIG_PHP8_LIBXML CONFIG_PHP8_SYSTEMTZDATA
+	CONFIG_PHP8_LIBXML CONFIG_PHP8_SYSTEMTZDATA CONFIG_PACKAGE_php8-apache
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
@@ -91,6 +91,12 @@ define Package/php8/description
 
   Please note, that installing php5 and php8 in parallel on the same target
   is not supported in OpenWrt/LEDE/Entware.
+endef
+
+define Package/php8-dev
+  $(call Package/php8/Default)
+  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma
+  TITLE+= (dev)
 endef
 
 define Package/php8-cli
@@ -171,6 +177,19 @@ define Package/php8-mod-intl/description
   select/install package 'icu-full-data'.
 endef
 
+define Package/php8-apache
+  $(call Package/php8/Default)
+  DEPENDS+=PACKAGE_php8-apache:apache \
+	   +PACKAGE_php8-mod-intl:libstdcpp \
+	   +libpcre2 +zlib
+  TITLE:=PHP8 module for Apache Web Server
+endef
+
+define Package/php8-apache/description
+  $(call Package/php8/Default/description)
+  This package contains the PHP module for the Apache Web Server.
+endef
+
 # not everything groks --disable-nls
 DISABLE_NLS:=
 
@@ -199,6 +218,13 @@ CONFIGURE_ARGS+= \
 	\
 	--without-valgrind \
 	--with-external-pcre
+
+ifeq ($(CONFIG_LIBC_USE_GLIBC),y)
+TARGET_LDFLAGS += -ldl
+
+# XXX Entware specific: fixed issue #693
+TARGET_LDFLAGS += -lresolv
+endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php8-mod-tidy),)
   CONFIGURE_ARGS+= --with-tidy=shared,"$(STAGING_DIR)/opt"
@@ -571,6 +597,30 @@ define Package/php8/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/php.ini $(1)/opt/etc
 endef
 
+define Package/php8-dev/install
+	$(INSTALL_DIR) $(1)/opt/bin
+	$(INSTALL_DIR) $(1)/opt/include
+	$(INSTALL_DIR) $(1)/opt/lib
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(1)/opt/bin/phpize8
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(1)/opt/bin/php8-config
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php8
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php8
+	sed -i -e "s#prefix='/opt'#prefix='/opt'#" $(1)/opt/bin/phpize8
+	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='/opt'#" $(1)/opt/bin/phpize8
+	sed -i -e "s#/include\`/php\"#/include\`/php8\"#" $(1)/opt/bin/phpize8
+	sed -i -e "s#/lib/php\`/build\"#/lib/php8\`/build\"#" $(1)/opt/bin/phpize8
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/phpize8
+	sed -i -e "s#prefix=\"/opt\"#prefix=\"/opt\"#" $(1)/opt/bin/php8-config
+	sed -i -e "s#/include/php\"#/include/php8\"#" $(1)/opt/bin/php8-config
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/php8-config
+	
+endef
+
+define Package/php8-apache/install
+	$(INSTALL_DIR) $(1)/opt/lib/apache2
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libs/libphp.so $(1)/opt/lib/apache2
+endef
+
 define Package/php8-cli/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(CP) $(PKG_BUILD_DIR)/sapi/cli/php $(1)/opt/bin/php8-cli
@@ -646,10 +696,10 @@ define Build/InstallDev
 	make -C $(PKG_BUILD_DIR) install INSTALL_ROOT=$(PKG_BUILD_DIR)/staging
 	rm -rf $(PKG_BUILD_DIR)/staging/opt/{share,man,sbin}
 	rm -f $(PKG_BUILD_DIR)/staging/opt/bin/{php,php-cgi,php-cli}
-	mv $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(PKG_BUILD_DIR)/staging/opt/bin/phpize8
-	mv $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php8-config
-	mv $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php8
-	mv $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php8
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(PKG_BUILD_DIR)/staging/opt/bin/phpize8
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php8-config
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php8
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php8
 
 	$(CP) $(PKG_BUILD_DIR)/staging/opt $(STAGING_DIR)/
 
@@ -695,10 +745,12 @@ $(eval $(call BuildPackage,php8))
 $(eval $(call BuildPackage,php8-cgi))
 $(eval $(call BuildPackage,php8-cli))
 $(eval $(call BuildPackage,php8-dbg))
+$(eval $(call BuildPackage,php8-dev))
 $(eval $(call BuildPackage,php8-embed))
 $(eval $(call BuildPackage,php8-fastcgi))
 $(eval $(call BuildPackage,php8-fpm))
 $(eval $(call BuildPackage,php8-litespeed))
+$(eval $(call BuildPackage,php8-apache))
 
 #$(eval $(call BuildModule,NAME,TITLE[,PKG DEPENDS]))
 $(eval $(call BuildModule,tidy,TIDY,+PACKAGE_php8-mod-tidy:libtidy))
