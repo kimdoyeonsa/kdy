@@ -603,6 +603,7 @@ define Package/php81-dev/install
 	sed -i -e "s#/include/php\"#/include/php81\"#" $(1)/opt/bin/php81-config
 	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/php81-config
 	sed -i -e "s#$(STAGING_DIR)/opt/lib#/opt/lib#" $(1)/opt/bin/php81-config
+	sed -i -e "s#/opt/lib/php/extensions/no-debug-non-zts-20210902#/opt/lib/php81#" $(1)/opt/bin/php81-config
 	ln -sf php81-config $(1)/opt/bin/php-config
 	$(INSTALL_DIR) $(1)/opt/include
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
