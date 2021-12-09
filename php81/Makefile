@@ -695,14 +695,11 @@ define Build/InstallDev
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php81-config
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php81
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php81
-
 	$(CP) $(PKG_BUILD_DIR)/staging/opt $(STAGING_DIR)/
-
 	sed -i -e "s#prefix='/opt'#prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#/include\`/php\"#/include\`/php81\"#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#/lib/php\`/build\"#/lib/php81\`/build\"#" $(STAGING_DIR)/opt/bin/phpize81
-
 	sed -i -e "s#prefix=\"/opt\"#prefix=\"$(STAGING_DIR)/opt\"#" $(STAGING_DIR)/opt/bin/php81-config
 	sed -i -e "s#/include/php\"#/include/php81\"#" $(STAGING_DIR)/opt/bin/php81-config
 	$(INSTALL_DIR) $(1)/opt/include/phpc
@@ -710,14 +707,11 @@ define Build/InstallDev
 endef
 
 define BuildModule
-
   define Package/php81-mod-$(1)
     $(call Package/php81/Default)
-
     ifneq ($(3),)
       DEPENDS+=$(3)
     endif
-
     TITLE:=$(2) shared module
   endef
 
@@ -731,9 +725,7 @@ define BuildModule
 	echo "extension=$(subst -,_,$(1)).so" > $$(1)/opt/etc/php81/$(if $(4),$(4),20)_$(subst -,_,$(1)).ini
     endif
   endef
-
   $$(eval $$(call BuildPackage,php81-mod-$(1)))
-
 endef
 
 $(eval $(call BuildPackage,php81))
