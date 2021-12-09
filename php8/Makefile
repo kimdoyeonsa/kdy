@@ -597,6 +597,33 @@ define Package/php8/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/php.ini $(1)/opt/etc
 endef
 
+define Package/php8-dev/install
+	$(INSTALL_DIR) $(1)/opt/bin
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(1)/opt/bin/phpize8
+	sed -i -e "s#prefix='/opt'#prefix='/opt'#" $(1)/opt/bin/phpize8
+	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='/opt'#" $(1)/opt/bin/phpize8
+	sed -i -e "s#/include\`/php\"#/include\`/php8\"#" $(1)/opt/bin/phpize8
+	sed -i -e "s#/lib/php\`/build\"#/lib/php8\`/build\"#" $(1)/opt/bin/phpize8
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/phpize8
+	ln -sf phpize8 $(1)/opt/bin/phpize
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(1)/opt/bin/php8-config
+	sed -i -e "s#prefix=\"/opt\"#prefix=\"/opt\"#" $(1)/opt/bin/php8-config
+	sed -i -e "s#/include/php\"#/include/php8\"#" $(1)/opt/bin/php8-config
+	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/php8-config
+	sed -i -e "s#$(STAGING_DIR)/opt/lib#/opt/lib#" $(1)/opt/bin/php8-config
+	sed -i -e "s#/opt/lib/php/extensions/no-debug-non-zts-20200930#/opt/lib/php8#" $(1)/opt/bin/php8-config
+	ln -sf php8-config $(1)/opt/bin/php-config
+	$(INSTALL_DIR) $(1)/opt/include
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php8
+	$(INSTALL_DIR) $(1)/opt/lib
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php8
+endef
+
+define Package/php8-apache/install
+	$(INSTALL_DIR) $(1)/opt/lib/apache2
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libs/libphp.so $(1)/opt/lib/apache2
+endef
+
 define Package/php8-cli/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(CP) $(PKG_BUILD_DIR)/sapi/cli/php $(1)/opt/bin/php8-cli
@@ -676,14 +703,11 @@ define Build/InstallDev
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php8-config
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php8
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php8
-
 	$(CP) $(PKG_BUILD_DIR)/staging/opt $(STAGING_DIR)/
-
 	sed -i -e "s#prefix='/opt'#prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize8
 	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize8
 	sed -i -e "s#/include\`/php\"#/include\`/php8\"#" $(STAGING_DIR)/opt/bin/phpize8
 	sed -i -e "s#/lib/php\`/build\"#/lib/php8\`/build\"#" $(STAGING_DIR)/opt/bin/phpize8
-
 	sed -i -e "s#prefix=\"/opt\"#prefix=\"$(STAGING_DIR)/opt\"#" $(STAGING_DIR)/opt/bin/php8-config
 	sed -i -e "s#/include/php\"#/include/php8\"#" $(STAGING_DIR)/opt/bin/php8-config
 	$(INSTALL_DIR) $(1)/opt/include/phpc
@@ -691,17 +715,13 @@ define Build/InstallDev
 endef
 
 define BuildModule
-
   define Package/php8-mod-$(1)
     $(call Package/php8/Default)
-
     ifneq ($(3),)
       DEPENDS+=$(3)
     endif
-
     TITLE:=$(2) shared module
   endef
-
   define Package/php8-mod-$(1)/install
 	$(INSTALL_DIR) $$(1)/opt/lib/php8
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/modules/$(subst -,_,$(1)).so $$(1)/opt/lib/php8/
@@ -712,9 +732,7 @@ define BuildModule
 	echo "extension=$(subst -,_,$(1)).so" > $$(1)/opt/etc/php8/$(if $(4),$(4),20)_$(subst -,_,$(1)).ini
     endif
   endef
-
   $$(eval $$(call BuildPackage,php8-mod-$(1)))
-
 endef
 
 $(eval $(call BuildPackage,php8))
