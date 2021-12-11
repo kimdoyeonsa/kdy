@@ -591,28 +591,30 @@ endef
 
 define Package/php81-dev/install
 	$(INSTALL_DIR) $(1)/opt/bin
-	$(INSTALL_DIR) $(1)/opt/include
-	$(INSTALL_DIR) $(1)/opt/lib
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/phpize $(1)/opt/bin/phpize81
-	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(1)/opt/bin/php81-config
-	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
-	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php81
 	sed -i -e "s#prefix='/opt'#prefix='/opt'#" $(1)/opt/bin/phpize81
 	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='/opt'#" $(1)/opt/bin/phpize81
 	sed -i -e "s#/include\`/php\"#/include\`/php81\"#" $(1)/opt/bin/phpize81
 	sed -i -e "s#/lib/php\`/build\"#/lib/php81\`/build\"#" $(1)/opt/bin/phpize81
 	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/phpize81
+	ln -sf phpize81 $(1)/opt/bin/phpize
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(1)/opt/bin/php81-config
 	sed -i -e "s#prefix=\"/opt\"#prefix=\"/opt\"#" $(1)/opt/bin/php81-config
 	sed -i -e "s#/include/php\"#/include/php81\"#" $(1)/opt/bin/php81-config
 	sed -i -e "s#$(STAGING_DIR_HOST)/bin/sed#/opt/bin/sed#" $(1)/opt/bin/php81-config
-#	sed -i -e "s#$(STAGING_DIR)/opt/lib#/opt/lib#" $(1)/opt/bin/php81-config
+	sed -i -e "s#$(STAGING_DIR)/opt/lib#/opt/lib#" $(1)/opt/bin/php81-config
+	sed -i -e "s#/opt/lib/php/extensions/no-debug-non-zts-20210902#/opt/lib/php81#" $(1)/opt/bin/php81-config
+	ln -sf php81-config $(1)/opt/bin/php-config
+	$(INSTALL_DIR) $(1)/opt/include
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
+	$(INSTALL_DIR) $(1)/opt/lib
+	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php81
 endef
 
 define Package/php81-apache/install
 	$(INSTALL_DIR) $(1)/opt/lib/apache2
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libs/libphp.so $(1)/opt/lib/apache2
 endef
-
 
 define Package/php81-cli/install
 	$(INSTALL_DIR) $(1)/opt/bin
@@ -623,11 +625,13 @@ endef
 define Package/php81-dbg/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(CP) $(PKG_BUILD_DIR)/sapi/phpdbg/phpdbg $(1)/opt/bin/php81-dbg
+	ln -sf php81-dbg $(1)/opt/bin/php-dbg
 endef
 
 define Package/php81-litespeed/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(CP) $(PKG_BUILD_DIR)/sapi/litespeed/php $(1)/opt/bin/php81-lsphp
+	ln -sf php81-lsphp $(1)/opt/bin/php-lsphp
 endef
 
 define Package/php81-embed/install
@@ -638,14 +642,15 @@ endef
 define Package/php81-cgi/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(CP) $(PKG_BUILD_DIR)/sapi/cgi/php-cgi $(1)/opt/bin/php81-cgi
+	ln -sf php81-cgi $(1)/opt/bin/php-cgi
 endef
 
 define Package/php81-fastcgi/install
 	$(INSTALL_DIR) $(1)/opt/etc/php81
 	$(INSTALL_DATA) ./files/php81-fastcgi.conf $(1)/opt/etc/php81/php81-fastcgi
-
 	$(INSTALL_DIR) $(1)/opt/etc/init.d
 	$(INSTALL_BIN) ./files/S79php81-fastcgi $(1)/opt/etc/init.d
+	ln -sf S79php81-fastcgi $(1)/opt/etc/init.d/S79php-fastcgi
 endef
 
 define Package/php81-fastcgi/conffiles
@@ -655,18 +660,15 @@ endef
 define Package/php81-fpm/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/sapi/fpm/php-fpm $(1)/opt/bin/php81-fpm
-
 	$(INSTALL_DIR) $(1)/opt/etc
 	$(INSTALL_DATA) ./files/php81-fpm.conf $(1)/opt/etc/php81-fpm.conf
-
 #	$(INSTALL_DIR) $(1)/etc/config
 #	$(INSTALL_DATA) ./files/php81-fpm.config $(1)/etc/config/php81-fpm
-
 	$(INSTALL_DIR) $(1)/opt/etc/php81-fpm.d
 	$(INSTALL_DATA) ./files/php81-fpm-www.conf $(1)/opt/etc/php81-fpm.d/www.conf
-
 	$(INSTALL_DIR) $(1)/opt/etc/init.d
 	$(INSTALL_BIN) ./files/S79php81-fpm $(1)/opt/etc/init.d
+	ln -sf S79php81-fpm $(1)/opt/etc/init.d/S79php-fpm
 endef
 
 define Package/php81-fpm/conffiles
@@ -693,14 +695,11 @@ define Build/InstallDev
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/bin/php-config $(PKG_BUILD_DIR)/staging/opt/bin/php81-config
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(PKG_BUILD_DIR)/staging/opt/include/php81
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(PKG_BUILD_DIR)/staging/opt/lib/php81
-
 	$(CP) $(PKG_BUILD_DIR)/staging/opt $(STAGING_DIR)/
-
 	sed -i -e "s#prefix='/opt'#prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#exec_prefix=\"\`eval echo /opt\`\"#exec_prefix='$(STAGING_DIR)/opt'#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#/include\`/php\"#/include\`/php81\"#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#/lib/php\`/build\"#/lib/php81\`/build\"#" $(STAGING_DIR)/opt/bin/phpize81
-
 	sed -i -e "s#prefix=\"/opt\"#prefix=\"$(STAGING_DIR)/opt\"#" $(STAGING_DIR)/opt/bin/php81-config
 	sed -i -e "s#/include/php\"#/include/php81\"#" $(STAGING_DIR)/opt/bin/php81-config
 	$(INSTALL_DIR) $(1)/opt/include/phpc
@@ -708,14 +707,11 @@ define Build/InstallDev
 endef
 
 define BuildModule
-
   define Package/php81-mod-$(1)
     $(call Package/php81/Default)
-
     ifneq ($(3),)
       DEPENDS+=$(3)
     endif
-
     TITLE:=$(2) shared module
   endef
 
@@ -729,9 +725,7 @@ define BuildModule
 	echo "extension=$(subst -,_,$(1)).so" > $$(1)/opt/etc/php81/$(if $(4),$(4),20)_$(subst -,_,$(1)).ini
     endif
   endef
-
   $$(eval $$(call BuildPackage,php81-mod-$(1)))
-
 endef
 
 $(eval $(call BuildPackage,php81))
