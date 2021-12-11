@@ -5,12 +5,12 @@
 
 include $(TOPDIR)/rules.mk
 
-PECL_NAME:=xdebug
-PECL_LONGNAME:=xdebug
+PECL_NAME:=rdkafka
+PECL_LONGNAME:=rdkafka
 
-PKG_VERSION:=3.1.2
+PKG_VERSION:=6.0.0RC2
 PKG_RELEASE:=1
-PKG_HASH:=083f6be1100df79ccbdf049dafc3930bab35f0eb80f9b19ac1ad84fa6779ccf3
+PKG_HASH:=a24e67bdc9ff7a13b3449d8c437c4f93ddce4790e075711af3e5c2f81cf73caf
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -26,5 +26,8 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),,,zend))
+CONFIGURE_ARGS+= \
+      --with-rdkafka=$(STAGING_DIR)/opt
+
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+librdkafka,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))

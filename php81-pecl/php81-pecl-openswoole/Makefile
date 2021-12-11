@@ -5,12 +5,12 @@
 
 include $(TOPDIR)/rules.mk
 
-PECL_NAME:=swoole
-PECL_LONGNAME:=swoole
+PECL_NAME:=openswoole
+PECL_LONGNAME:=openswoole
 
-PKG_VERSION:=4.8.3
+PKG_VERSION:=4.8.1
 PKG_RELEASE:=1
-PKG_HASH:=39afd29e698c73f2995f23ffa97f414fb575c4f6b811625afc650d9e0a40e29c
+PKG_HASH:=630f55d015f069b1dd83baa0b71e7ad376e0191c48645fd0ff47c8d48ee290c1
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -34,6 +34,7 @@ CONFIGURE_ARGS+= \
 --enable-http2=yes \
 --enable-swoole=yes \
 --enable-mysqlnd=yes \
+--with-postgres=$(STAGING_DIR)/opt/bin \
 --enable-cares=no \
 --with-openssl-dir=$(STAGING_DIR)/opt/include \
 --with-jemalloc-dir=no \
@@ -44,5 +45,5 @@ CONFIGURE_ARGS+= \
 --enable-swoole-curl=yes \
 --enable-thread-context=yes
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libstdcpp +libopenssl,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libpq +libopenssl +libstdcpp,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
