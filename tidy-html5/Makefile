@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tidy-html5
-PKG_VERSION:=5.8.0
+PKG_VERSION:=5.9.14
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-next.tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/htacg/tidy-html5/tar.gz/refs/tags/$(PKG_VERSION)?
-PKG_HASH:=59c86d5b2e452f63c5cdb29c866a12a4c55b1741d7025cf2f3ce0cde99b0660e
+PKG_HASH:=83cc9d9cdfa59bfe400dc745dea14eb1e1be4ca088facfb911eac8b78e75f2b4
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=README/LICENSE.md README/LICENSE.txt
