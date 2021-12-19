@@ -5,12 +5,12 @@
 
 include $(TOPDIR)/rules.mk
 
-PECL_NAME:=msgpack
-PECL_LONGNAME:=msgpack
+PECL_NAME:=mongodb
+PECL_LONGNAME:=mongodb
 
-PKG_VERSION:=2.2.0RC1
+PKG_VERSION:=1.12.0
 PKG_RELEASE:=1
-PKG_HASH:=55ad876ba2340233450fc246978229772078f16d83edbab0f6ccb2cc4b7ca63f
+PKG_HASH:=0d9f670b021288bb6c9b060979f191f1da773d729100673166f38b617e24317e
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -26,10 +26,9 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
-define Build/InstallDev
-	$(INSTALL_DIR) $(1)/opt/include/ext/msgpack
-	$(CP)	$(PKG_BUILD_DIR)/php_msgpack.h $(1)/opt/include/ext/msgpack
-endef
+CONFIGURE_ARGS+= \
+--enable-mongodb \
+--enable-mongodb-coverage=yes
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81-mod-session +php81-mod-sockets,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libsasl2 +libsasl2-sasldb +icu +libopenssl +libzstd +libsnappy,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))

@@ -1,0 +1,11 @@
+--- a/config.m4	2021-01-15 11:28:19.000000000 +0900
++++ b/config.m4	2021-12-19 13:02:33.982584301 +0900
+@@ -32,7 +32,7 @@
+   AC_MSG_CHECKING([searching for libsnappy])
+ 
+   if test "$PHP_SNAPPY_INCLUDEDIR" != "no"; then
+-    for i in $PHP_SNAPPY_INCLUDEDIR /usr/local /usr; do
++    for i in $PHP_SNAPPY_INCLUDEDIR /opt/local /opt; do
+       if test -r $i/include/snappy-c.h; then
+         LIBSNAPPY_CFLAGS="-I$i/include"
+         LIBSNAPPY_LIBDIR="$i/$PHP_LIBDIR"
