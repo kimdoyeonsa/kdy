@@ -30,5 +30,10 @@ CONFIGURE_ARGS+= \
 --with-igbinary \
 --enable-igbinary
 
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/opt/include/ext/igbinary
+	$(CP)	$(PKG_BUILD_DIR)/igbinary.h $(1)/opt/include/ext/igbinary
+endef
+
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
 $(eval $(call BuildPackage,$(PKG_NAME)))
