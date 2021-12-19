@@ -10,12 +10,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=librdkafka
-PKG_VERSION:=1.6.2
+PKG_VERSION:=1.8.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=v$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/edenhill/librdkafka/archive/refs/tags/
-PKG_HASH:=b9be26c632265a7db2fdd5ab439f2583d14be08ab44dc2e33138323af60c39db
+PKG_HASH:=6a747d293a7a4613bd2897e28e8791476fbe1ae7361f2530a876e0fd483482a6
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=GFDL-1.2 GPL-2 LGPL-2.1
