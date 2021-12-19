@@ -80,7 +80,12 @@ MARIADB_SERVER_PLUGINS := \
 	server_audit \
 	simple_password_check \
 	sql_errlog \
-	wsrep_info
+	wsrep_info \
+	provider_bzip2 \
+	provider_lz4 \
+	provider_lzo \
+	provider_lzma \
+	provider_snappy
 
 PKG_CONFIG_DEPENDS := \
 	$(patsubst %,CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-%,$(subst _,-,$(MARIADB_SERVER_PLUGINS))) \
@@ -110,6 +115,11 @@ plugin-server_audit             := PLUGIN_SERVER_AUDIT
 plugin-simple_password_check    := PLUGIN_SIMPLE_PASSWORD_CHECK
 plugin-sql_errlog               := PLUGIN_SQL_ERRLOG
 plugin-wsrep_info               := PLUGIN_WSREP_INFO
+plugin-provider_bzip2 		 :=PLUGIN_PROVIDER_BZIP2
+plugin-provider_lz4 		 :=PLUGIN_PROVIDER_LZ4
+plugin-provider_lzo 		 :=PLUGIN_PROVIDER_LZO
+plugin-provider_lzma 		 :=PLUGIN_PROVIDER_LZMA
+plugin-provider_snappy 		 :=PLUGIN_PROVIDER_SNAPPY
 
 MARIADB_CLIENT := \
 	mysql \
@@ -393,9 +403,11 @@ CMAKE_OPTIONS += \
 	-DSKIP_TESTS=ON \
 	-DWITH_DEBUG=OFF \
 	-DWITH_EMBEDDED_SERVER=OFF \
-	-DWITH_INNODB_BZIP2=ON\
+	-DWITH_INNODB_BZIP2=ON \
 	-DWITH_INNODB_LZ4=ON \
 	-DWITH_INNODB_LZMA=ON \
+	-DWITH_INNODB_LZO=ON \
+	-DWITH_INNODB_SNAPPY=ON \
 	-DWITH_JEMALLOC=ON \
 	-DWITH_LIBARCHIVE=ON \
 	-DWITH_LIBWRAP=OFF \
