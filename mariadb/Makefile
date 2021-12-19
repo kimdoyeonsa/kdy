@@ -175,6 +175,10 @@ MARIADB_COMMON_DEPENDS := \
 	+libatomic \
 	+libopenssl \
 	+libstdcpp \
+	+libbz2 \
+	+libsnappy \
+	+liblzo \
+	+liblz4 \
 	+zlib \
 	+libpcre2
 
@@ -295,6 +299,8 @@ define Package/mariadb-server-base
 	  +!KERNEL_IO_URING:libaio \
 	  +KERNEL_IO_URING:liburing \
 	  +liblzma \
+	  +liblzo \
+	  +libsnappy \
 	  +libpcre \
 	  +resolveip
 	  
@@ -390,8 +396,6 @@ CMAKE_OPTIONS += \
 	-DWITH_INNODB_BZIP2=ON\
 	-DWITH_INNODB_LZ4=ON \
 	-DWITH_INNODB_LZMA=ON \
-	-DWITH_INNODB_LZO=ON \
-	-DWITH_INNODB_SNAPPY=ON \
 	-DWITH_JEMALLOC=ON \
 	-DWITH_LIBARCHIVE=ON \
 	-DWITH_LIBWRAP=OFF \
@@ -404,8 +408,7 @@ CMAKE_OPTIONS += \
 	-DWITH_VALGRIND=OFF \
 	-DWITH_ZLIB=system \
 	-DMYSQLD_USER=root \
-	-DDEFAULT_SYSCONFDIR=/opt/etc/mysql \
-	
+	-DDEFAULT_SYSCONFDIR=/opt/etc/mysql 
 
 # Help MariaDB find the correct libiconv.
 # nls.mk sets it up so that with CONFIG_BUILD_NLS libiconv-full would be used,
@@ -416,7 +419,8 @@ CMAKE_OPTIONS += \
 	-DICONV_LIBRARIES=$(ICONV_PREFIX)/lib/libiconv.$(if $(CONFIG_BUILD_NLS),so,a)
 
 CMAKE_OPTIONS += \
-	$(foreach p,$(MARIADB_SERVER_PLUGINS),-D$(plugin-$(p))=$(if $(CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-$(subst _,-,$(p))),DYNAMIC,NO))
+	$(foreach p,$(MARIADB_SERVER_PLUGINS),-D$(plugin-$(p))=$(if $(CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-$(subst _,-,$(p))),DYNAMIC,NO)) \
+
 
 # Disable some client library plugins
 CMAKE_OPTIONS += \
@@ -579,12 +583,7 @@ ifeq ($(1),auth_pam)
 		  $(PKG_INSTALL_DIR)/opt/lib/security/pam_user_map.so \
 					  $$(1)/opt/lib/security
 endif
-ifeq ($(1),ha_spider)
-	 #$(INSTALL_DIR) $$(1)$(SHARE_DIR)
-	  #$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/install_spider.sql \
-		#  $$(1)$(SHARE_DIR)
-endif
-  endef
+endef
   $$(eval $$(call BuildPackage,mariadb-server-plugin-$(subst _,-,$(1))))
 endef
 
@@ -596,6 +595,11 @@ $(eval $(call BuildPackage,mariadb-server))
 $(eval $(call BuildPackage,mariadb-server-base))
 $(eval $(call BuildPackage,mariadb-server-extra))
 
+$(eval $(call BuildPlugin,provider_lzma,))
+$(eval $(call BuildPlugin,provider_bzip2,))
+$(eval $(call BuildPlugin,provider_lz4,))
+$(eval $(call BuildPlugin,provider_lzo,))
+$(eval $(call BuildPlugin,provider_snappy,))
 $(eval $(call BuildPlugin,auth_ed25519,))
 $(eval $(call BuildPlugin,auth_gssapi,+krb5-libs))
 $(eval $(call BuildPlugin,auth_pam,+libpam))
