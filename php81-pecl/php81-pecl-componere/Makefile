@@ -5,12 +5,12 @@
 
 include $(TOPDIR)/rules.mk
 
-PECL_NAME:=pcov
-PECL_LONGNAME:=pcov
+PECL_NAME:=componere
+PECL_LONGNAME:=componere
 
-PKG_VERSION:=1.0.11
+PKG_VERSION:=3.1.2
 PKG_RELEASE:=1
-PKG_HASH:=ad22e64cd3af065330182ac142c1c3ab40de934482cd400f8bd76064130ac242
+PKG_HASH:=6463f62ada13ee967928cceabda886262b0ad27b4994e0775b1f7c72ec2940db
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -27,8 +27,8 @@ include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
 CONFIGURE_ARGS+= \
-      --enable-pcov 
-        
+      --enable-componere=yes \
+	--enable-componere-coverage=yes
 
 
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
