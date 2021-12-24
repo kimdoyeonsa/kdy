@@ -14,7 +14,6 @@ PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.abisource.com/downloads/$(PKG_NAME)/$(PKG_VERSION)
 PKG_HASH:=2fac9e7be7e9424b2c5570d8affe568db39f7572c10ed48d4e13cddf03f7097f
-PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
