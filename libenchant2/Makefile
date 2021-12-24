@@ -8,13 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=enchant
-PKG_VERSION:=2.3.1
+PKG_VERSION:=2.3.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/AbiWord/enchant/releases/download/v$(PKG_VERSION)
-PKG_HASH:=7b4b1afcf2cd8bfa691deea6188404d337f23174bbc39b9c2add2bf340736e9c
-PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
+PKG_HASH:=ce9ba47fd4d34031bd69445598a698a6611602b2b0e91d705e91a6f5099ead6e
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
