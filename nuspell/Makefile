@@ -10,12 +10,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nuspell
-PKG_VERSION:=5.0.0
+PKG_VERSION:=5.0.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=v$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/nuspell/nuspell/archive/refs/tags/
-PKG_HASH:=855d4771d225dcce1e48d098be6a2d69629c635b79b53f9e095a35adc68f0ea1
+PKG_HASH:=a48d9b0297f9c87d8e3231b2662786c5380634cd2b2e0005c55709caefdaa032
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=GFDL-1.2 GPL-2 LGPL-2.1
