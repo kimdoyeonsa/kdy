@@ -19,8 +19,6 @@ PKG_SOURCE_URL:=http://pecl.php.net/get/
 PKG_BUILD_DIR:=$(BUILD_DIR)/pecl-php81/$(PECL_NAME)-$(PKG_VERSION)
 PKG_BUILD_PARALLEL:=1
 
-PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
-
 PKG_LICENSE:=PHP-3.01
 PKG_LICENSE_FILES:=LICENSE
 
