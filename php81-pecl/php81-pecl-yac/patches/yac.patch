@@ -1,11 +1,22 @@
---- a/storage/allocator/yac_allocator.h	2021-12-18 18:21:49.000000000 +0900
-+++ b/storage/allocator/yac_allocator.h	2021-12-26 13:40:38.104391121 +0900
-@@ -43,7 +43,7 @@
- #elif defined(HAVE_SHM_IPC)
+--- a/storage/allocator/yac_allocator.h
++++ b/storage/allocator/yac_allocator.h
+@@ -34,18 +34,8 @@
+ #define YAC_SMM_MIN_BLOCK_SIZE      128
+ #define YAC_SMM_ALIGNED_SIZE(x)     (((x) + YAC_SMM_ALIGNMENT - 1) & YAC_SMM_ALIGNMENT_MASK)
+ #define YAC_SMM_TRUE_SIZE(x)        ((x < YAC_SMM_MIN_BLOCK_SIZE)? (YAC_SMM_MIN_BLOCK_SIZE) : (YAC_SMM_ALIGNED_SIZE(x)))
+-
+-#ifdef PHP_WIN32
+-#  define USE_FILE_MAPPING	1
+-#  define inline __inline
+-#elif defined(HAVE_SHM_MMAP_ANON)
+-#  define USE_MMAP      1
+-#elif defined(HAVE_SHM_IPC)
  #  define USE_SHM       1
- #else 
+-#else 
 -#error(no builtin shared memory supported)
-+
- #endif
- 
+-#endif
+-
++#  define USE_MMAP      1
  #define ALLOC_FAILURE           0
+ #define ALLOC_SUCCESS           1
+ #define FAILED_REATTACHED       2
