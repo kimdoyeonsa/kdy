@@ -25,7 +25,6 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
-
 define Build/Prepare
 	$(Build/Prepare/Default)
 	( cd $(PKG_BUILD_DIR)/ext; $(STAGING_DIR)/opt/bin/phpize81 )

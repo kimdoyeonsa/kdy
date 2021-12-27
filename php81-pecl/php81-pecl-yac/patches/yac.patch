@@ -1,0 +1,11 @@
+--- a/storage/allocator/yac_allocator.h	2021-12-18 18:21:49.000000000 +0900
++++ b/storage/allocator/yac_allocator.h	2021-12-26 13:40:38.104391121 +0900
+@@ -43,7 +43,7 @@
+ #elif defined(HAVE_SHM_IPC)
+ #  define USE_SHM       1
+ #else 
+-#error(no builtin shared memory supported)
++
+ #endif
+ 
+ #define ALLOC_FAILURE           0

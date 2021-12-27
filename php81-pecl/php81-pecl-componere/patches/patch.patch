@@ -1,0 +1,20 @@
+--- a/src/definition.c	2020-10-08 15:10:32.000000000 +0900
++++ b/src/definition.c	2021-12-27 10:20:05.858752265 +0900
+@@ -849,7 +849,7 @@
+         o->ce->ce_flags |= ZEND_ACC_IMPLEMENT_TRAITS;
+ #endif
+ 
+-        zend_do_link_class(o->ce, NULL);
++        zend_do_link_class(o->ce, NULL,NULL);
+ 
+         o->ce->num_traits  = num_traits + 1;
+         o->ce->trait_names -= num_traits;
+@@ -967,7 +967,7 @@
+ 			o->ce->parent_name = NULL;
+ 			o->ce->properties_info_table = NULL;
+ 
+-        		zend_do_link_class(o->ce, NULL);
++        		zend_do_link_class(o->ce, NULL,NULL);
+ 
+ 			o->ce->parent_name = parent_name;
+ 		}

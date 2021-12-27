@@ -36,5 +36,19 @@ define Build/InstallDev
 	$(CP) $(PKG_BUILD_DIR)/*.h $(1)/opt/include/ext/apcu
 endef
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
+define Package/apcu-h
+ SUBMENU:=PHP81
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=apcu-h
+endef
+
+define Package/apcu-h/install
+	$(INSTALL_DIR) $(1)/opt/include/ext/apcu 
+	$(CP) $(PKG_BUILD_DIR)/*.h $(1)/opt/include/ext/apcu
+endef
+
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+apcu-h))
 $(eval $(call BuildPackage,$(PKG_NAME)))
+$(eval $(call BuildPackage,apcu-h))
+

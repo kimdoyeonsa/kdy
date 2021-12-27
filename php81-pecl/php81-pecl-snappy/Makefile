@@ -33,5 +33,5 @@ CONFIGURE_ARGS+= \
 --enable-snappy \
 --with-snappy-includedir=$(STAGING_DIR)/opt
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81-pecl-apcu +libsnappy,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81-pecl-apcu +apcu-h +libsnappy,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))

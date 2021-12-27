@@ -31,5 +31,18 @@ define Build/InstallDev
 	$(CP)	$(PKG_BUILD_DIR)/php_msgpack.h $(1)/opt/include/ext/msgpack
 endef
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81-mod-session +php81-mod-sockets,30))
+define Package/msgpack-h
+ SUBMENU:=PHP81
+  SECTION:=lang
+  CATEGORY:=Languages
+  TITLE:=msgpack-h
+endef
+
+define Package/msgpack-h/install
+	$(INSTALL_DIR) $(1)/opt/include/ext/msgpack
+	$(CP)	$(PKG_BUILD_DIR)/php_msgpack.h $(1)/opt/include/ext/msgpack
+endef
+
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81-mod-session +php81-mod-sockets +msgpack-h,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
+$(eval $(call BuildPackage,msgpack-h))
