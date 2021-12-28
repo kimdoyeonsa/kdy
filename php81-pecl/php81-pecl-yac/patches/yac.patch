@@ -1,6 +1,6 @@
 --- a/storage/allocator/yac_allocator.h
 +++ b/storage/allocator/yac_allocator.h
-@@ -34,18 +34,8 @@
+@@ -34,18 +34,7 @@
  #define YAC_SMM_MIN_BLOCK_SIZE      128
  #define YAC_SMM_ALIGNED_SIZE(x)     (((x) + YAC_SMM_ALIGNMENT - 1) & YAC_SMM_ALIGNMENT_MASK)
  #define YAC_SMM_TRUE_SIZE(x)        ((x < YAC_SMM_MIN_BLOCK_SIZE)? (YAC_SMM_MIN_BLOCK_SIZE) : (YAC_SMM_ALIGNED_SIZE(x)))
@@ -16,7 +16,7 @@
 -#error(no builtin shared memory supported)
 -#endif
 -
-+#  define USE_MMAP      1
  #define ALLOC_FAILURE           0
  #define ALLOC_SUCCESS           1
  #define FAILED_REATTACHED       2
+
