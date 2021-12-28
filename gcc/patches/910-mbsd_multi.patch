@@ -1,0 +1,75 @@
+commit 99368862e44740ff4fd33760893f04e14f9dbdf1
+Author: Felix Fietkau <nbd@openwrt.org>
+Date:   Tue Jul 31 00:52:27 2007 +0000
+
+    Port the mbsd_multi patch from freewrt, which adds -fhonour-copts. This will emit warnings in packages that don't use our target cflags properly
+    
+    SVN-Revision: 8256
+
+	This patch brings over a feature from MirBSD:
+	* -fhonour-copts
+	  If this option is not given, it's warned (depending
+	  on environment variables). This is to catch errors
+	  of misbuilt packages which override CFLAGS themselves.
+
+	This patch was authored by Thorsten Glaser <tg at mirbsd.de>
+	with copyright assignment to the FSF in effect.
+
+
+ 
+--- a/gcc/c-family/c.opt
++++ b/gcc/c-family/c.opt
+@@ -1469,6 +1469,9 @@ C++ ObjC++ Optimization Alias(fexception
+ fhonor-std
+ C++ ObjC++ Ignore Warn(switch %qs is no longer supported)
+ 
++fhonour-copts
++C ObjC C++ ObjC++ RejectNegative
++
+ fhosted
+ C ObjC
+ Assume normal C execution environment.
+--- a/gcc/common.opt
++++ b/gcc/common.opt
+@@ -1551,6 +1551,9 @@ fguess-branch-probability
+ Common Report Var(flag_guess_branch_prob) Optimization
+ Enable guessing of branch probabilities.
+ 
++fhonour-copts
++Common RejectNegative
++
+ ; Nonzero means ignore `#ident' directives.  0 means handle them.
+ ; Generate position-independent code for executables if possible
+ ; On SVR4 targets, it also controls whether or not to emit a
+--- a/gcc/opts.c
++++ b/gcc/opts.c
+@@ -2073,6 +2073,9 @@ common_handle_option (struct gcc_options
+ 			       opts, opts_set, loc, dc);
+       break;
+ 
++    case OPT_fhonour_copts:
++      break;
++
+     case OPT_Wlarger_than_:
+       opts->x_larger_than_size = value;
+       opts->x_warn_larger_than = value != -1;
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -7019,6 +7019,17 @@ This option is only supported for C and
+ @option{-Wall} and by @option{-Wpedantic}, which can be disabled with
+ @option{-Wno-pointer-sign}.
+ 
++@item -fhonour-copts
++@opindex fhonour-copts
++If @env{GCC_HONOUR_COPTS} is set to 1, abort if this option is not
++given at least once, and warn if it is given more than once.
++If @env{GCC_HONOUR_COPTS} is set to 2, abort if this option is not
++given exactly once.
++If @env{GCC_HONOUR_COPTS} is set to 0 or unset, warn if this option
++is not given exactly once.
++The warning is quelled if @env{GCC_HONOUR_COPTS} is set to @samp{s}.
++This flag and environment variable only affect the C language.
++
+ @item -Wstack-protector
+ @opindex Wstack-protector
+ @opindex Wno-stack-protector
