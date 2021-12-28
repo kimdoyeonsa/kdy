@@ -79,30 +79,31 @@ ifneq ($(CONFIG_SOFT_FLOAT),y)
 		ARM_FLOAT_OPTION:= --with-float=hard
 	endif
 endif
-GMPSRC=gmp-6.1.0
+
+GMPSRC=gmp-6.2.1
 
 define Download/gmp
-  URL:=ftp://gcc.gnu.org/pub/gcc/infrastructure/
+  URL:=https://gcc.gnu.org/pub/gcc/infrastructure/
   FILE:=$(GMPSRC).tar.bz2
-  HASH:=498449a994efeba527885c10405993427995d3f86b8768d8cdf8d9dd7c6b73e8
+  HASH:=eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c
 endef
 $(eval $(call Download,gmp))
 
-MPCSRC=mpc-1.0.3
+MPCSRC=mpc-1.2.1
 
 define Download/mpc
-  URL:=ftp://gcc.gnu.org/pub/gcc/infrastructure/
+  URL:=https://gcc.gnu.org/pub/gcc/infrastructure/
   FILE:=$(MPCSRC).tar.gz
-  HASH:=617decc6ea09889fb08ede330917a00b16809b8db88c29c31bfbb49cbf88ecc3
+  HASH:=17503d2c395dfcf106b622dc142683c1199431d095367c6aacba6eec30340459
 endef
 $(eval $(call Download,mpc))
 
-MPFRSRC=mpfr-3.1.6
+MPFRSRC=mpfr-4.1.0
 
 define Download/mpfr
-  URL:=ftp://gcc.gnu.org/pub/gcc/infrastructure/
+  URL:=https://gcc.gnu.org/pub/gcc/infrastructure/
   FILE:=$(MPFRSRC).tar.bz2
-  HASH:=cf4f4b2d80abb79e820e78c8077b6725bbbb4e8f41896783c899087be0e94068
+  HASH:=feced2d430dd5a97805fa289fed3fc8ff2b094c02d05287fd6133e7f1f0ec926
 endef
 $(eval $(call Download,mpfr))
 
@@ -119,7 +120,6 @@ define Build/Prepare
 #	poor man's fix for `none-openwrt-linux' not recognized when building with musl
 	cp $(PKG_BUILD_DIR)/config.sub $(PKG_BUILD_DIR)/mpfr/
 	cp $(PKG_BUILD_DIR)/config.sub $(PKG_BUILD_DIR)/gmp/
-	chmod u+w $(PKG_BUILD_DIR)/mpc/config.sub
 	cp $(PKG_BUILD_DIR)/config.sub $(PKG_BUILD_DIR)/mpc/
 endef
 
