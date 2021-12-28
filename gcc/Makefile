@@ -165,8 +165,10 @@ define Build/Configure
 endef
 
 define Build/Compile
-	export SHELL="$(BASH)"; $(MAKE_VARS) $(MAKE) -C $(PKG_BUILD_DIR) \
-			DESTDIR="$(PKG_INSTALL_DIR)" $(MAKE_ARGS) all install
+	export SHELL="$(BASH)"; $(MAKE_VARS) $(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
+			DESTDIR="$(PKG_INSTALL_DIR)" $(MAKE_ARGS) all
+	export SHELL="$(BASH)"; $(MAKE_VARS) $(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
+			DESTDIR="$(PKG_INSTALL_DIR)" $(MAKE_ARGS) install
 endef
 
 ENVCFLAGS:="$(TARGET_OPTIMIZATION) $(EXTRA_OPTIMIZATION)
