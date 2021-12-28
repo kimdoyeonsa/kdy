@@ -11,7 +11,6 @@ define Package/gcc/description
 	device.
 endef
 
-
 define Package/gcc
   SECTION:=devel
   CATEGORY:=Development
@@ -36,8 +35,6 @@ PKG_CPE_ID:=cpe:/a:gnu:gcc
 ifeq ($(PKG_VERSION),8.5.0)
 	PKG_HASH:=d308841a511bb830a6100397b0042db24ce11f642dab6ea6ee44842e5325ed50
 endif
-
-
 
 define Package/gcc/config
   source "$(SOURCE)/Config.in"
