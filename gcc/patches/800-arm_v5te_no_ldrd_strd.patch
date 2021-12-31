@@ -21,12 +21,13 @@ Date:   Wed Feb 19 19:20:10 2014 +0000
 
 --- a/gcc/config/arm/arm.h
 +++ b/gcc/config/arm/arm.h
-@@ -155,7 +155,7 @@ extern tree arm_fp16_type_node;
+@@ -167,7 +167,7 @@
  /* Thumb-1 only.  */
  #define TARGET_THUMB1_ONLY		(TARGET_THUMB1 && !arm_arch_notm)
  
--#define TARGET_LDRD			(arm_arch5e && ARM_DOUBLEWORD_ALIGN \
+-#define TARGET_LDRD			(arm_arch5te && ARM_DOUBLEWORD_ALIGN \
 +#define TARGET_LDRD			(arm_arch6 && ARM_DOUBLEWORD_ALIGN \
                                           && !TARGET_THUMB1)
  
  #define TARGET_CRC32			(arm_arch_crc)
+

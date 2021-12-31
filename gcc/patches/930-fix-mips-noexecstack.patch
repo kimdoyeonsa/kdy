@@ -48,7 +48,7 @@ sellcey@mips.com
 
 --- a/gcc/config/mips/mips.c
 +++ b/gcc/config/mips/mips.c
-@@ -22625,6 +22625,9 @@
+@@ -22804,6 +22804,9 @@
  #undef TARGET_CUSTOM_FUNCTION_DESCRIPTORS
  #define TARGET_CUSTOM_FUNCTION_DESCRIPTORS 2
  
