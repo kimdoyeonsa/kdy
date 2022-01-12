@@ -15,7 +15,7 @@ Date:   Mon Jun 22 10:31:07 2015 +0000
 
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -876,7 +876,9 @@ proper position among the other output f
+@@ -875,7 +875,9 @@ proper position among the other output f
  #endif
  
  #ifndef LINK_SSP_SPEC

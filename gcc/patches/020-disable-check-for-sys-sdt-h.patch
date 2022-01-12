@@ -1,7 +1,7 @@
 @@ -0,0 +1,45 @@
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -29361,19 +29361,6 @@ $as_echo "#define ENABLE_DEFAULT_SSP 1"
+@@ -29822,19 +29822,6 @@ $as_echo "#define ENABLE_DEFAULT_SSP 1"
  fi
  
  
@@ -23,7 +23,7 @@
  # Some glibc targets used DFmode long double, but with glibc 2.4
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -6002,16 +6002,6 @@ if test x$enable_default_ssp = xyes ; th
+@@ -6202,16 +6202,6 @@ if test x$enable_default_ssp = xyes ; th
  fi
  AC_SUBST([enable_default_ssp])
  

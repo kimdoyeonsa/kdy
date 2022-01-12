@@ -11,19 +11,20 @@ define Package/gcc/description
 	device.
 endef
 
+
 define Package/gcc
   SECTION:=devel
   CATEGORY:=Development
   TITLE:=gcc
   MAINTAINER:=Noble Pepper <gccmaintain@noblepepper.com>
-  DEPENDS:= +binutils +libstdcpp @!arc
+  DEPENDS:= +binutils +libstdcpp +libzstd @!arc
   MENU:=1
 endef
 
 PKG_NAME:=gcc
 # PKG_VERSION=7.3.0
-PKG_VERSION=9.4.0
-PKG_RELEASE:=1a
+PKG_VERSION=10.3.0
+PKG_RELEASE:=1b
 PKG_SOURCE_URL:=@GNU/gcc/gcc-$(PKG_VERSION)
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_INSTALL:=1
@@ -32,9 +33,11 @@ PKG_BUILD_PARALLEL:=1
 
 PKG_CPE_ID:=cpe:/a:gnu:gcc
 
-ifeq ($(PKG_VERSION),9.4.0)
-	PKG_HASH:=c95da32f440378d7751dd95533186f7fc05ceb4fb65eb5b85234e6299eb9838e
+ifeq ($(PKG_VERSION),10.3.0)
+	PKG_HASH:=64f404c1a650f27fc33da242e1f2df54952e3963a49e06e73f6940f3223ac344
 endif
+
+
 
 define Package/gcc/config
   source "$(SOURCE)/Config.in"
@@ -76,7 +79,6 @@ ifneq ($(CONFIG_SOFT_FLOAT),y)
 		ARM_FLOAT_OPTION:= --with-float=hard
 	endif
 endif
-
 GMPSRC=gmp-6.2.1
 
 define Download/gmp

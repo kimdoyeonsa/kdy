@@ -30,7 +30,7 @@
  		      struct _Unwind_Context * context)
 --- a/libstdc++-v3/libsupc++/eh_personality.cc	2021-06-01 16:53:06.876501000 +0900
 +++ b/libstdc++-v3/libsupc++/eh_personality.cc	2021-12-30 18:03:55.676817669 +0900
-@@ -343,7 +343,6 @@
+@@ -351,7 +351,6 @@
  #endif
  _Unwind_Reason_Code
  #ifdef __ARM_EABI_UNWINDER__

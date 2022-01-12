@@ -1,6 +1,6 @@
 --- a/gcc/real.h
 +++ b/gcc/real.h
-@@ -70,9 +70,10 @@ struct GTY(()) real_value {
+@@ -77,9 +77,10 @@ struct GTY(()) real_value {
     + (REAL_VALUE_TYPE_SIZE%HOST_BITS_PER_WIDE_INT ? 1 : 0)) /* round up */
  
  /* Verify the guess.  */

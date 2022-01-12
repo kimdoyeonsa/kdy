@@ -1,0 +1,58 @@
+--- a/php_weakref.c	2022-01-06 23:37:27.000000000 +0900
++++ b/php_weakref.c	2022-01-07 17:29:49.267953721 +0900
+@@ -29,10 +29,6 @@
+ #include "wr_store.h"
+ #include "php_weakref.h"
+ 
+-#if PHP_VERSION_ID >= 80000
+-#error weakreference_bc PECL is a polyfill for PHP versions older than 8.0. It is not needed in php 8.
+-#endif
+-
+ #ifdef ZTS
+ int weakreference_bc_globals_id;
+ #else
+@@ -59,14 +55,14 @@
+ 
+ PHP_RINIT_FUNCTION(weakreference_bc) /* {{{ */
+ {
+-	wr_store_init(TSRMLS_C);
++	wr_store_init(TSRM_H);
+ 	return SUCCESS;
+ }
+ /* }}} */
+ 
+ PHP_RSHUTDOWN_FUNCTION(weakreference_bc) /* {{{ */
+ {
+-	wr_store_destroy(TSRMLS_C);
++	wr_store_destroy(TSRM_H);
+ 	return SUCCESS;
+ }
+ /* }}} */
+
+--- a/wr_weakmap.c	2022-01-06 23:37:27.000000000 +0900
++++ b/wr_weakmap.c	2022-01-07 17:43:16.863999669 +0900
+@@ -371,10 +371,10 @@
+ 
+ 	wr_ce_WeakMap = zend_register_internal_class(&weakmap_ce);
+ 
+-	wr_ce_WeakMap->ce_flags        |= ZEND_ACC_FINAL;
++	wr_ce_WeakMap->ce_flags        = ZEND_ACC_FINAL;
+ 	wr_ce_WeakMap->create_object    = wr_weakmap_object_new;
+-	wr_ce_WeakMap->serialize        = zend_class_serialize_deny;
+-	wr_ce_WeakMap->unserialize      = zend_class_unserialize_deny;
++	wr_ce_WeakMap->serialize        = zend_serialize_data;
++	wr_ce_WeakMap->unserialize      = zend_unserialize_data;
+ 
+ 	memcpy(&wr_handler_WeakMap, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+ 
+@@ -382,7 +382,7 @@
+ 	wr_handler_WeakMap.free_obj  = wr_weakmap_object_free_storage;
+ 	wr_handler_WeakMap.offset    = XtOffsetOf(wr_weakmap_object, std);
+ 
+-	zend_class_implements(wr_ce_WeakMap, 3, spl_ce_Countable, spl_ce_ArrayAccess, spl_ce_Iterator);
++   zend_class_implements(wr_ce_WeakMap, 3, zend_ce_countable, zend_ce_arrayaccess, zend_ce_iterator);
+ 
+ 	return SUCCESS;
+ }
+ 
+
