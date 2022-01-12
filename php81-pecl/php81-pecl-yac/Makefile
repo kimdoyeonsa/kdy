@@ -32,11 +32,6 @@ CONFIGURE_ARGS+= \
 	--enable-json=yes \
 	--enable-msgpack=yes \
 	--enable-igbinary=yes 
-	
-CONFIGURE_VARS+= \
-HAVE_SHM_MMAP_ANON=1
-
-
 
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+php81 +php81-mod-opcache +php81-pecl-igbinary +igbinary-h  +php81-pecl-msgpack +msgpack-h +libfastlz,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
