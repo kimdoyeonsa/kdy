@@ -1,26 +1,25 @@
 #
 # Copyright (C) 2018 Sebastian Kemper <sebastian_ml@gmx.net>
+# Copyright (C) 2021 Michal Hrusecky <michal@hrusecky.net>
 #
 # This is free software, licensed under the GNU General Public License v2.
 # See /LICENSE for more information.
 #
+# XXX Entware specific: keep /opt/var/run/mysqld
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mariadb
 PKG_VERSION:=10.7.1
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL := \
-	https://mirror.netcologne.de/mariadb/$(PKG_NAME)-$(PKG_VERSION)/source \
-	https://mirror.lstn.net/mariadb/$(PKG_NAME)-$(PKG_VERSION)/source \
-	https://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/$(PKG_NAME)-$(PKG_VERSION)/source \
-	https://downloads.mariadb.org/interstitial/$(PKG_NAME)-$(PKG_VERSION)/source
+PKG_SOURCE_URL := https://archive.mariadb.org/$(PKG_NAME)-$(PKG_VERSION)/source
+
 
 PKG_HASH:=ec70e24a1ee42087b1187c734dad5ae8b36a4ce6e3635ec76112bd07d819d6be
 PKG_MAINTAINER:=Michal Hrusecky <Michal@Hrusecky.net>
-PKG_LICENSE:=GPL-2.0
+PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=COPYING THIRDPARTY
 
 PKG_CPE_ID:=cpe:/a:mariadb:mariadb
@@ -39,10 +38,8 @@ MARIADB_SOCKET=/opt/var/run/mysqld/mysqld.sock
 
 MARIADB_DISABLE_ENGINES := \
 	cassandra \
+	columnstore \
 	example \
-	mroonga \
-	oqgraph \
-	rocksdb \
 	test_sql_discovery \
 	tokudb
 
@@ -70,6 +67,8 @@ MARIADB_SERVER_PLUGINS := \
 	ha_connect \
 	ha_federated \
 	ha_federatedx \
+	ha_mroonga \
+	ha_rocksdb \
 	ha_sphinx \
 	ha_spider \
 	handlersocket \
@@ -85,7 +84,8 @@ MARIADB_SERVER_PLUGINS := \
 	provider_lz4 \
 	provider_lzo \
 	provider_lzma \
-	provider_snappy
+	provider_snappy 
+	
 
 PKG_CONFIG_DEPENDS := \
 	$(patsubst %,CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-%,$(subst _,-,$(MARIADB_SERVER_PLUGINS))) \
@@ -104,6 +104,8 @@ plugin-ha_blackhole             := PLUGIN_BLACKHOLE
 plugin-ha_connect               := PLUGIN_CONNECT
 plugin-ha_federated             := PLUGIN_FEDERATED
 plugin-ha_federatedx            := PLUGIN_FEDERATEDX
+plugin-ha_mroonga               := PLUGIN_MROONGA
+plugin-ha_rocksdb        	 := PLUGIN_ROCKSDB
 plugin-ha_sphinx                := PLUGIN_SPHINX
 plugin-ha_spider                := PLUGIN_SPIDER
 plugin-handlersocket            := PLUGIN_HANDLERSOCKET
@@ -191,7 +193,7 @@ MARIADB_COMMON_DEPENDS := \
 	+liblz4 \
 	+zlib \
 	+libpcre2
-
+	
 # Pass CPPFLAGS in the CFLAGS as otherwise the build system will
 # ignore them.
 TARGET_CFLAGS+=$(TARGET_CPPFLAGS)
@@ -203,14 +205,13 @@ define Package/mariadb/disable/engine
 endef
 
 define Package/mariadb/disable/plugin
-      echo $(1)/plugin/$(2)/CMakeLists.txt
+	echo $(1)/plugin/$(2)/CMakeLists.txt
 endef
 
 define Package/mariadb/install/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/opt/bin/$(2) $(1)/opt/bin
-	cd "$(PKG_INSTALL_DIR)/opt/bin"; find . -maxdepth 1 -type l \
-		-regex './$(subst mysql,mariadb[-]*,$(subst _,-,$(2)))' \
-		| xargs  -I{} $(CP) {} "$(1)/opt/bin"
+	[ $(2) = $(subst mysql,mariadb,$(2)) ] || ln -s $(2) $(1)/opt/bin/$(subst mysql,mariadb,$(2))
+	[ $(2) = $(subst mariadb,mysql,$(2)) ] || ln -s $(2) $(1)/opt/bin/$(subst mariadb,mysql,$(2))
 endef
 
 define Package/mariadb/install/plugin
@@ -232,7 +233,8 @@ define Package/mariadb-client
   $(call Package/mariadb/Default)
   TITLE:=MariaDB database client
   MENU:=1
-  DEPENDS:=mariadb-client-base
+  DEPENDS:=$(MARIADB_COMMON_DEPENDS) \
+	  +libedit
 endef
 
 define Package/mariadb-client/description
@@ -241,26 +243,6 @@ $(call Package/mariadb/description/Default)
 This package includes the following core client binaries:
 
 $(subst $(space),$(newline),$(MARIADB_CLIENT))
-
-endef
-
-define Package/mariadb-client-base
-  $(call Package/mariadb/Default)
-  TITLE:=MariaDB database client base
-  DEPENDS:=mariadb-common \
-	  $(MARIADB_COMMON_DEPENDS) \
-	  +libedit
-endef
-
-define Package/mariadb-client-base/conffiles
-$(CONF_DIR)/conf.d/50-mysql-clients.cnf
-endef
-
-define Package/mariadb-client-base/description
-$(call Package/mariadb/description/Default)
-
-This package provides the foundation for mariadb-client. It installs the
-configuration and the dependencies.
 
 endef
 
@@ -284,13 +266,7 @@ define Package/mariadb-server
   DEPENDS:=mariadb-server-base
   TITLE:=MariaDB database server
   MENU:=1
-  PROVIDES:=mysql-server \
-    $(MARIADB_COMMON_DEPENDS) \
-     +pcre2
-endef
-
-define Package/mariadb-server/conffiles
-/opt/bin/mysqld_safe
+  PROVIDES:=mysql-server
 endef
 
 define Package/mariadb-server/description
@@ -304,21 +280,21 @@ endef
 
 define Package/mariadb-server-base
   $(call Package/mariadb/Default)
-  DEPENDS:=mariadb-common \
+  DEPENDS:= \
 	  $(MARIADB_COMMON_DEPENDS) \
 	  +!KERNEL_IO_URING:libaio \
 	  +KERNEL_IO_URING:liburing \
 	  +liblzma \
 	  +liblzo \
 	  +libsnappy \
-	  +libpcre \
+	  +libpcre2 \
 	  +resolveip
-	  
   TITLE:=MariaDB database server base
   USERID:=mariadb=376:mariadb=376
 endef
 
 define Package/mariadb-server-base/conffiles
+$(CONF_DIR)/my.cnf
 $(CONF_DIR)/conf.d/50-server.cnf
 $(CONF_DIR)/conf.d/60-galera.cnf
 endef
@@ -382,6 +358,8 @@ CMAKE_OPTIONS += \
 	-DCONNECT_WITH_MONGO=NO \
 	-DCONNECT_WITH_ODBC=NO \
 	-DDISABLE_SHARED=NO \
+	-DDEFAULT_CHARSET=utf8mb4 \
+	-DDEFAULT_COLLATION=utf8mb4_general_ci \
 	-DENABLED_PROFILING=OFF \
 	-DENABLE_STATIC_LIBS=OFF \
 	-DINSTALL_DOCDIR=share/doc/mariadb \
@@ -393,6 +371,7 @@ CMAKE_OPTIONS += \
 	-DINSTALL_PAMDATADIR="/opt/etc/security" \
 	-DINSTALL_PAMDIR="/opt/lib/security" \
 	-DINSTALL_PLUGINDIR=lib/mariadb/plugin \
+	-DINSTALL_PREFIX="/opt" \
 	-DINSTALL_SBINDIR=bin \
 	-DINSTALL_SCRIPTDIR=bin \
 	-DINSTALL_SQLBENCHDIR="" \
@@ -408,19 +387,19 @@ CMAKE_OPTIONS += \
 	-DWITH_INNODB_LZMA=ON \
 	-DWITH_INNODB_LZO=ON \
 	-DWITH_INNODB_SNAPPY=ON \
-	-DWITH_JEMALLOC=ON \
-	-DWITH_LIBARCHIVE=ON \
+	-DWITH_JEMALLOC=OFF \
+	-DWITH_LIBARCHIVE=OFF \
 	-DWITH_LIBWRAP=OFF \
 	-DWITH_MARIABACKUP=ON \
 	-DWITH_NUMA=OFF \
 	-DWITH_PCRE=system \
 	-DWITH_SAFEMALLOC=OFF \
 	-DWITH_SSL=system \
-	-DWITH_SYSTEMD=auto \
+	-DWITH_SYSTEMD=no \
 	-DWITH_VALGRIND=OFF \
 	-DWITH_ZLIB=system \
 	-DMYSQLD_USER=root \
-	-DDEFAULT_SYSCONFDIR=/opt/etc/mysql 
+	-DDEFAULT_SYSCONFDIR=/opt/etc/mysql
 
 # Help MariaDB find the correct libiconv.
 # nls.mk sets it up so that with CONFIG_BUILD_NLS libiconv-full would be used,
@@ -431,13 +410,12 @@ CMAKE_OPTIONS += \
 	-DICONV_LIBRARIES=$(ICONV_PREFIX)/lib/libiconv.$(if $(CONFIG_BUILD_NLS),so,a)
 
 CMAKE_OPTIONS += \
-	$(foreach p,$(MARIADB_SERVER_PLUGINS),-D$(plugin-$(p))=$(if $(CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-$(subst _,-,$(p))),DYNAMIC,NO)) \
-
+	$(foreach p,$(MARIADB_SERVER_PLUGINS),-D$(plugin-$(p))=$(if $(CONFIG_PACKAGE_$(PKG_NAME)-server-plugin-$(subst _,-,$(p))),DYNAMIC,NO))
 
 # Disable some client library plugins
 CMAKE_OPTIONS += \
 	-DCLIENT_PLUGIN_AUTH_GSSAPI_CLIENT=OFF \
-	-DCLIENT_PLUGIN_REMOTE_IO=ON
+	-DCLIENT_PLUGIN_REMOTE_IO=OFF
 
 # Set CMAKE_FIND_ROOT_PATH_MODE_INCLUDE and CMAKE_FIND_ROOT_PATH_MODE_LIBRARY
 # to BOTH as otherwise the host build will not find some required dependencies
@@ -508,11 +486,6 @@ define Package/mariadb-client/install
 	cd $(1)/opt/bin; $(LN) mysqlcheck mysqloptimize
 endef
 
-define Package/mariadb-client-base/install
-	$(INSTALL_DIR) $(1)$(CONF_DIR)/conf.d
-	$(INSTALL_DATA) conf/50-mysql-clients.cnf $(1)$(CONF_DIR)/conf.d
-endef
-
 define Package/mariadb-client-extra/install
 	$(INSTALL_DIR) $(1)/opt/bin
 	$(foreach b,$(MARIADB_CLIENT_EXTRA),$(call Package/mariadb/install/bin,$(1),$(b));)
@@ -522,8 +495,6 @@ endef
 
 define Package/mariadb-server/install
 	$(INSTALL_DIR) $(1)/opt/bin
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/opt/bin/mariadbd $(1)/opt/bin
-	chmod 755 $(1)/opt/bin/mariadbd
 	$(foreach b,$(MARIADB_SERVER),$(call Package/mariadb/install/bin,$(1),$(b));)
 endef
 
@@ -537,16 +508,11 @@ define Package/mariadb-server-base/install
 	$(SED) '/^[a-z]/s/^/#/' $(PKG_INSTALL_DIR)$(SHARE_DIR)/wsrep.cnf
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/wsrep.cnf $(1)$(CONF_DIR)/conf.d/60-galera.cnf
 	$(INSTALL_DATA) conf/50-server.cnf $(1)$(CONF_DIR)/conf.d
+	$(INSTALL_DATA) conf/my.cnf $(1)$(CONF_DIR)
 #	$(INSTALL_CONF) files/mysqld.config $(1)/etc/config/mysqld
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/charsets/* $(1)$(SHARE_DIR)/charsets
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/english/errmsg.sys $(1)$(SHARE_DIR)/english
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/fill_help_tables.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/maria_add_gis_sp_bootstrap.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/mysql_performance_tables.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/mysql_system_tables.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/mysql_system_tables_data.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/mysql_sys_schema.sql $(1)$(SHARE_DIR)
-	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/mysql_test_db.sql $(1)$(SHARE_DIR)
+	$(INSTALL_DATA) $(PKG_INSTALL_DIR)$(SHARE_DIR)/*.sql $(1)$(SHARE_DIR)
 	$(INSTALL_DIR) $(1)/opt/var/run/mysqld
 endef
 
@@ -595,13 +561,12 @@ ifeq ($(1),auth_pam)
 		  $(PKG_INSTALL_DIR)/opt/lib/security/pam_user_map.so \
 					  $$(1)/opt/lib/security
 endif
-endef
+  endef
   $$(eval $$(call BuildPackage,mariadb-server-plugin-$(subst _,-,$(1))))
 endef
 
 $(eval $(call HostBuild))
 $(eval $(call BuildPackage,mariadb-client))
-$(eval $(call BuildPackage,mariadb-client-base))
 $(eval $(call BuildPackage,mariadb-client-extra))
 $(eval $(call BuildPackage,mariadb-server))
 $(eval $(call BuildPackage,mariadb-server-base))
@@ -624,6 +589,9 @@ $(eval $(call BuildPlugin,ha_blackhole,))
 $(eval $(call BuildPlugin,ha_connect,+libxml2))
 $(eval $(call BuildPlugin,ha_federated,))
 $(eval $(call BuildPlugin,ha_federatedx,))
+$(eval $(call BuildPlugin,ha_mroonga,))
+$(eval $(call BuildPlugin,ha_rocksdb,+libzstd))
+$(eval $(call BuildPlugin,ha_s3,+libcurl))
 $(eval $(call BuildPlugin,ha_sphinx,))
 $(eval $(call BuildPlugin,ha_spider,))
 $(eval $(call BuildPlugin,handlersocket,))

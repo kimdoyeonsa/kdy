@@ -9,8 +9,8 @@
 +  if test -z "$plugindir"
 +  then
 +    echo "Could not find plugin directory." >&2
-+    echo "Will continue with \"/usr/lib/mariadb/plugin\"." >&2
-+    plugindir=/usr/lib/mariadb/plugin
++    echo "Will continue with \"/opt/lib/mariadb/plugin\"." >&2
++    plugindir=/opt/lib/mariadb/plugin
 +  fi
    pamtooldir=$plugindir
  # relative from where the script was run for a relocatable install
