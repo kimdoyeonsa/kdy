@@ -1,0 +1,47 @@
+--- a/configure	2017-05-06 23:49:08.000000000 +0900
++++ b/configure	2022-01-13 21:47:26.818459037 +0900
+@@ -12251,7 +12251,7 @@
+ 
+ 
+ 
+-      GETTEXT_MACRO_VERSION=0.18
++      GETTEXT_MACRO_VERSION=0.20
+ 
+ 
+ 
+
+--- a/configure.ac	2017-05-04 05:16:37.000000000 +0900
++++ b/configure.ac	2022-01-13 21:46:33.482836975 +0900
+@@ -38,7 +38,7 @@
+ # checks for programs
+ 
+ AM_GNU_GETTEXT([external])
+-AM_GNU_GETTEXT_VERSION([0.18])
++AM_GNU_GETTEXT_VERSION([0.20])
+ AC_PROG_YACC
+ AS_IF([test "$YACC" != 'bison -y'], [
+ 	YACC="\${top_srcdir}/build-aux/missing bison -y"
+--- a/m4/po.m4	2017-05-06 23:48:57.000000000 +0900
++++ b/m4/po.m4	2022-01-13 21:45:48.747187652 +0900
+@@ -29,7 +29,7 @@
+ 
+   dnl Release version of the gettext macros. This is used to ensure that
+   dnl the gettext macros and po/Makefile.in.in are in sync.
+-  AC_SUBST([GETTEXT_MACRO_VERSION], [0.18])
++  AC_SUBST([GETTEXT_MACRO_VERSION], [0.20])
+ 
+   dnl Perform the following tests also if --disable-nls has been given,
+   dnl because they are needed for "make dist" to work.
+--- a/po/Makefile.in.in	2017-05-06 23:48:57.000000000 +0900
++++ b/po/Makefile.in.in	2022-01-13 18:42:49.228040539 +0900
+@@ -9,7 +9,7 @@
+ # General Public License and is *not* in the public domain.
+ #
+ # Origin: gettext-0.18
+-GETTEXT_MACRO_VERSION = 0.18
++GETTEXT_MACRO_VERSION = 0.20
+ 
+ PACKAGE = @PACKAGE@
+ VERSION = @VERSION@
+
+
