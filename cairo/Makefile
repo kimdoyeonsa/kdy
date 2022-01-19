@@ -26,7 +26,7 @@ define Package/libcairo
   CATEGORY:=Libraries
   TITLE:=libcairo
   URL:=https://www.cairographics.org/
-  DEPENDS:=+zlib +libpng +pixman +libintl-full +glib2 +liblzo +libfreetype +libfontconfig
+  DEPENDS:=+zlib +libpng +pixman +libintl-full +glib2 +liblzo +libfreetype +fontconfig
 endef
 
 define Package/cairo
