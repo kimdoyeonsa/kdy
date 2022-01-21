@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=php
-PKG_VERSION:=8.1.0
+PKG_VERSION:=8.1.2
 PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
@@ -16,7 +16,7 @@ PKG_CPE_ID:=cpe:/a:php:php
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=http://www.php.net/distributions/
-PKG_HASH:=a1317eff0723a2b3d3122bbfe107a1158570ea2822dc35a5fb360086db0f6bbc
+PKG_HASH:=6b448242fd360c1a9f265b7263abf3da25d28f2b2b0f5465533b69be51a391dd
 
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
@@ -25,10 +25,11 @@ php81_MODULES= \
 	bcmath bz2 \
 	calendar ctype curl \
 	dom \
-	exif \
+	exif enchant\
 	ffi fileinfo filter ftp \
 	gettext gd gmp \
 	iconv imap intl \
+	json \
 	ldap \
 	mbstring mysqli mysqlnd \
 	opcache openssl \
@@ -81,7 +82,7 @@ define Package/php81
            +php81_LIBXML:libxml2 \
            +php81_LIBXSL:libxslt \
            +php81_SYSTEMTZDATA:zoneinfo-core
-  CONFLICTS:=php8
+#  CONFLICTS:=php8
 endef
 
 define Package/php81/description
@@ -202,6 +203,7 @@ CONFIGURE_ARGS+= \
 	--with-pic \
 	--disable-rpath \
 	--disable-debug \
+	--enable-json=shared \
 	--with-libedit \
 	--enable-phpdbg \
 	--enable-phpdbg-webhelper \
@@ -218,6 +220,13 @@ CONFIGURE_ARGS+= \
 	\
 	--without-valgrind \
 	--with-external-pcre
+	
+ifeq ($(CONFIG_LIBC_USE_GLIBC),y)
+TARGET_LDFLAGS += -ldl
+
+# XXX Entware specific: fixed issue #693
+TARGET_LDFLAGS += -lresolv
+endif	
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-tidy),)
   CONFIGURE_ARGS+= --with-tidy=shared,"$(STAGING_DIR)/opt"
@@ -676,6 +685,24 @@ define Package/php81-fpm/conffiles
 /opt/etc/php81-fpm.d/
 endef
 
+define Package/php81-mod-openssl/postinst
+#!/bin/sh
+
+if [ -e "/opt/etc/php81/20_openssl.ini" ] && [ -e "/opt/etc/php81/15_openssl.ini" ]; then
+	echo "Renaming PHP ini file '/opt/etc/php81/20_openssl.ini' -> '/opt/etc/php81/15_openssl.ini'"
+	mv /opt/etc/php81/20_openssl.ini /opt/etc/php81/15_openssl.ini
+fi
+endef
+
+define Package/php81-mod-mysqli/postinst
+#!/bin/sh
+
+if [ -e "/opt/etc/php81/20_mysqli.ini" ] && [ -e "/opt/etc/php81/30_mysqli.ini" ]; then
+	echo "Renaming PHP ini file '/opt/etc/php81/20_mysqli.ini' -> '/opt/etc/php81/30_mysqli.ini'"
+	mv /opt/etc/php81/20_mysqli.ini /opt/etc/php81/30_mysqli.ini
+fi
+endef
+
 define Build/Prepare
 	$(call Build/Prepare/Default)
 	$(if $(QUILT),,( cd $(PKG_BUILD_DIR); touch configure.ac; ./buildconf --force ))
@@ -702,6 +729,8 @@ define Build/InstallDev
 	sed -i -e "s#/lib/php\`/build\"#/lib/php81\`/build\"#" $(STAGING_DIR)/opt/bin/phpize81
 	sed -i -e "s#prefix=\"/opt\"#prefix=\"$(STAGING_DIR)/opt\"#" $(STAGING_DIR)/opt/bin/php81-config
 	sed -i -e "s#/include/php\"#/include/php81\"#" $(STAGING_DIR)/opt/bin/php81-config
+	$(INSTALL_DIR) $(1)/opt//include/php/ext/pdo/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ext/pdo/php_pdo_driver.h $(1)/opt/include/php/ext/pdo/
 	$(INSTALL_DIR) $(1)/opt/include/phpc
 	$(INSTALL_DATA) ./files/phpc.h $(1)/opt/include/phpc
 endef
