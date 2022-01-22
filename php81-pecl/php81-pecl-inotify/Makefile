@@ -27,18 +27,14 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
-
-
 define Build/Prepare
 	$(Build/Prepare/Default)
 	( cp ./files/configure.patch $(PKG_BUILD_DIR); cd $(PKG_BUILD_DIR); $(STAGING_DIR)/opt/bin/phpize81 )
 endef
 
-
 define Build/Configure
 	( cd $(PKG_BUILD_DIR); patch configure<configure.patch; ./configure $(CONFIGURE_ARGS) )
 endef
-
 
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
 $(eval $(call BuildPackage,$(PKG_NAME)))
