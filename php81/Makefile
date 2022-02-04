@@ -618,6 +618,7 @@ define Package/php81-dev/install
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
 	$(INSTALL_DIR) $(1)/opt/lib
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php81
+	$(CP) $(STAGING_DIR_HOST)/bin/pkg-config* $(1)/opt/bin
 endef
 
 define Package/php81-apache/install
