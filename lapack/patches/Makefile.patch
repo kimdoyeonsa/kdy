@@ -1,0 +1,39 @@
+--- a/make.inc.example	2021-06-29 01:39:12.000000000 +0900
++++ b/make.inc.example	2022-02-06 11:18:54.925122343 +0900
+@@ -18,9 +18,9 @@
+ #  should not compile LAPACK with flags such as -ffpe-trap=overflow.
+ #
+ FC = gfortran
+-FFLAGS = -O2 -frecursive
++FFLAGS = -O2 -frecursive -fPIC
+ FFLAGS_DRV = $(FFLAGS)
+-FFLAGS_NOOPT = -O0 -frecursive
++FFLAGS_NOOPT = -O0 -frecursive -fPIC
+ 
+ #  Define LDFLAGS to the desired linker options for your machine.
+ #
+
+--- a/Makefile	2021-06-29 01:39:12.000000000 +0900
++++ b/Makefile	2022-02-06 10:46:39.567492563 +0900
+@@ -5,8 +5,11 @@
+ TOPSRCDIR = .
+ include $(TOPSRCDIR)/make.inc
+ 
++.PHONY: install
++install: lib lapacklib tmglib blaslib cblaslib lapackelib variants
++
+ .PHONY: all
+-all: lapack_install lib blas_testing lapack_testing
++all: lib lapacklib tmglib blaslib cblaslib lapackelib variants
+ 
+ .PHONY: lib
+ lib: lapacklib tmglib
+@@ -52,7 +55,7 @@
+ 
+ .PHONY: lapack_install
+ lapack_install:
+-	$(MAKE) -C INSTALL run
++	$(MAKE) -C INSTALL
+ 
+ .PHONY: blas_testing
+ blas_testing: blaslib
