@@ -1,0 +1,48 @@
+--- a/ext/kernel/main.c	2021-11-01 08:34:17.000000000 +0900
++++ b/ext/kernel/main.c	2022-01-25 18:16:52.527350086 +0900
+@@ -151,7 +151,7 @@
+ 			}
+ 		}
+ 
+-		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
++		if (instanceof_function(Z_OBJCE_P(value), zend_ce_countable)) {
+ #if PHP_VERSION_ID >= 80000
+ 			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
+ #else
+@@ -201,7 +201,7 @@
+ 			return (int) count > 0;
+ 		}
+ 
+-		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
++		if (instanceof_function(Z_OBJCE_P(value), zend_ce_countable)) {
+ #if PHP_VERSION_ID >= 80000
+ 			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
+ #else
+@@ -249,7 +249,7 @@
+ 			return (int) count;
+ 		}
+ 
+-		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
++		if (instanceof_function(Z_OBJCE_P(value), zend_ce_countable)) {
+ #if PHP_VERSION_ID >= 80000
+ 			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
+ #else
+@@ -282,7 +282,7 @@
+  */
+ int zephir_function_exists(const zval *function_name)
+ {
+-	if (zend_hash_str_exists(CG(function_table), Z_STRVAL_P(function_name), Z_STRLEN_P(function_name)) != NULL) {
++	if (zend_hash_str_exists(CG(function_table), Z_STRVAL_P(function_name), Z_STRLEN_P(function_name)) != 0) {
+ 		return SUCCESS;
+ 	}
+ 
+@@ -298,7 +298,7 @@
+  */
+ int zephir_function_exists_ex(const char *function_name, unsigned int function_len)
+ {
+-	if (zend_hash_str_exists(CG(function_table), function_name, function_len) != NULL) {
++	if (zend_hash_str_exists(CG(function_table), function_name, function_len) != 0) {
+         return SUCCESS;
+     }
+ 
+

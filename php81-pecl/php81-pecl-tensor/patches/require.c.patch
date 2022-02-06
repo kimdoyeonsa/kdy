@@ -1,0 +1,20 @@
+--- a/ext/kernel/require.c	2021-11-01 08:34:17.000000000 +0900
++++ b/ext/kernel/require.c	2022-01-25 18:37:24.085869874 +0900
+@@ -45,7 +45,7 @@
+ 	}
+ #endif
+ 
+-    ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
++    ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+     if (ret != SUCCESS) {
+         return FAILURE;
+     }
+@@ -110,7 +110,7 @@
+ 	}
+ #endif
+ 
+-    ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
++    ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+     if (ret != SUCCESS) {
+         return FAILURE;
+     }

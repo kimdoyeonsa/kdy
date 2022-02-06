@@ -1,0 +1,11 @@
+--- a/ext/tensor.c	2021-11-01 08:34:17.000000000 +0900
++++ b/ext/tensor.c	2022-01-25 22:57:39.868207838 +0900
+@@ -22,7 +22,7 @@
+ #include "kernel/memory.h"
+ 
+ 
+-#include "cblas.h"
++#include <cblas.h>
+ 
+ zend_class_entry *tensor_algebraic_ce;
+ zend_class_entry *tensor_arithmetic_ce;
