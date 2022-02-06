@@ -12,12 +12,13 @@ define Package/gcc/description
 endef
 
 
+
 define Package/gcc
   SECTION:=devel
   CATEGORY:=Development
   TITLE:=gcc
   MAINTAINER:=Noble Pepper <gccmaintain@noblepepper.com>
-  DEPENDS:= +binutils +libstdcpp +libzstd @!arc
+  DEPENDS:= +binutils +libstdcpp +libitm +libatomic +libgfortran +libzstd @!arc
   MENU:=1
 endef
 
@@ -36,8 +37,6 @@ PKG_CPE_ID:=cpe:/a:gnu:gcc
 ifeq ($(PKG_VERSION),10.3.0)
 	PKG_HASH:=64f404c1a650f27fc33da242e1f2df54952e3963a49e06e73f6940f3223ac344
 endif
-
-
 
 define Package/gcc/config
   source "$(SOURCE)/Config.in"
@@ -61,7 +60,7 @@ ifeq ($(CONFIG_INCLUDE_STATIC_LINK_SPEC),y)
 endif
 
 include $(INCLUDE_DIR)/package.mk
-TARGET_LANGUAGES:="c,c++"
+TARGET_LANGUAGES:="c,c++,fortran"
 BUGURL=https://dev.openwrt.org/
 PKGVERSION=OpenWrt GCC $(PKG_VERSION)
 TARGET_CPPFLAGS += -D_GLIBCXX_INCLUDE_NEXT_C_HEADERS
@@ -153,6 +152,8 @@ define Build/Configure
 			--disable-libgomp \
 			--disable-libquadmath \
 			--disable-libssp \
+			--enable-initfini-array \
+			--disable-tm-clone-registry \
 			--disable-decimal-float \
 			--disable-libstdcxx-pch \
 			--with-host-libstdcxx=-lstdc++ \
@@ -188,13 +189,16 @@ ENVLDFLAGS:="-Wl,-rpath=/opt/lib -Wl,--dynamic-linker=/opt/lib/$(DYNLINKER) -L/o
 define Package/gcc/install
 	$(INSTALL_DIR) $(1)/opt/bin $(1)/opt/lib $(1)/opt/lib/$(PKG_NAME)/$(REAL_GNU_TARGET_NAME)/$(PKG_VERSION)
 	cp -ar $(PKG_INSTALL_DIR)/opt/include $(1)/opt
-	cp -a $(PKG_INSTALL_DIR)/opt/bin/{$(REAL_GNU_TARGET_NAME)-{g++,gcc,gcc-ar},cpp,gcov} $(1)/opt/bin
+	cp -a $(PKG_INSTALL_DIR)/opt/bin/{$(REAL_GNU_TARGET_NAME)-{g++,gcc,gcc-ar,gcc-nm,gcc-ranlib,gfortran},cpp,gcov} $(1)/opt/bin
 	ln -s $(REAL_GNU_TARGET_NAME)-g++ $(1)/opt/bin/c++
 	ln -s $(REAL_GNU_TARGET_NAME)-g++ $(1)/opt/bin/g++
 	ln -s $(REAL_GNU_TARGET_NAME)-g++ $(1)/opt/bin/$(REAL_GNU_TARGET_NAME)-c++
 	ln -s $(REAL_GNU_TARGET_NAME)-gcc $(1)/opt/bin/gcc
 	ln -s $(REAL_GNU_TARGET_NAME)-gcc $(1)/opt/bin/cc
 	ln -s $(REAL_GNU_TARGET_NAME)-gcc $(1)/opt/bin/$(REAL_GNU_TARGET_NAME)-gcc-$(PKG_VERSION)
+	ln -s $(REAL_GNU_TARGET_NAME)-gfortran $(1)/opt/bin/gfortran
+	ln -s $(REAL_GNU_TARGET_NAME)-gcc-nm $(1)/opt/bin/gcc-nm
+	ln -s $(REAL_GNU_TARGET_NAME)-gcc-ranlib $(1)/opt/bin/gcc-ranlib
 	ln -s $(REAL_GNU_TARGET_NAME)-gcc-ar $(1)/opt/bin/gcc-ar
 	cp -ar $(PKG_INSTALL_DIR)/opt/lib/gcc $(1)/opt/lib
 	cp -ar $(TOOLCHAIN_DIR)/include $(1)/opt

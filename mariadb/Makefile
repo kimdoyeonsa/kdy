@@ -68,6 +68,7 @@ MARIADB_SERVER_PLUGINS := \
 	ha_federated \
 	ha_federatedx \
 	ha_mroonga \
+	ha_oqgraph \
 	ha_rocksdb \
 	ha_sphinx \
 	ha_spider \
@@ -105,6 +106,7 @@ plugin-ha_connect               := PLUGIN_CONNECT
 plugin-ha_federated             := PLUGIN_FEDERATED
 plugin-ha_federatedx            := PLUGIN_FEDERATEDX
 plugin-ha_mroonga               := PLUGIN_MROONGA
+plugin-ha_oqgraph               := PLUGIN_OQGRAPH
 plugin-ha_rocksdb        	 := PLUGIN_ROCKSDB
 plugin-ha_sphinx                := PLUGIN_SPHINX
 plugin-ha_spider                := PLUGIN_SPIDER
@@ -288,7 +290,8 @@ define Package/mariadb-server-base
 	  +liblzo \
 	  +libsnappy \
 	  +libpcre2 \
-	  +resolveip
+	  +resolveip \
+	  +sudo
   TITLE:=MariaDB database server base
   USERID:=mariadb=376:mariadb=376
 endef
@@ -590,6 +593,7 @@ $(eval $(call BuildPlugin,ha_connect,+libxml2))
 $(eval $(call BuildPlugin,ha_federated,))
 $(eval $(call BuildPlugin,ha_federatedx,))
 $(eval $(call BuildPlugin,ha_mroonga,))
+$(eval $(call BuildPlugin,ha_oqgraph,+libJudy))
 $(eval $(call BuildPlugin,ha_rocksdb,+libzstd))
 $(eval $(call BuildPlugin,ha_s3,+libcurl))
 $(eval $(call BuildPlugin,ha_sphinx,))
