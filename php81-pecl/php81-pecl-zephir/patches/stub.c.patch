@@ -1,0 +1,11 @@
+--- a/ext/stub.c	2021-10-25 00:17:19.000000000 +0900
++++ b/ext/stub.c	2022-02-07 19:05:58.956657649 +0900
+@@ -522,7 +522,7 @@
+ 	stub_globals->db.my_setting_3 = 7.5;
+ 	stub_globals->orm.cache_level = 3;
+ 
+-	stub_globals->orm.cache_prefix = ZSTR_VAL(zend_string_init(ZEND_STRL("prefix-string-"), 0));
++	stub_globals->orm.cache_prefix = zend_string_init(ZEND_STRL("prefix-string-"), 0);
+ 
+ 	stub_globals->my_setting_1 = 1;
+ 	stub_globals->test_setting_1 = 1;
