@@ -1,0 +1,114 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=OpenBLAS
+PKG_VERSION:=0.3.19
+PKG_RELEASE:=$(AUTORELEASE)
+
+PKG_SOURCE:=OpenBLAS-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://github.com/xianyi/OpenBLAS/releases/download/v$(PKG_VERSION)/
+PKG_HASH:=9721d04d72a7d601c81eafb54520ba2c
+PKG_LICENSE:=BSD 3-Clause
+PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
+
+PKG_BUILD_PARALLEL:=1
+PKG_INSTALL:=1
+
+include $(INCLUDE_DIR)/package.mk
+
+GCC=$(REAL_GNU_TARGET_NAME)-gcc
+GFC=$(REAL_GNU_TARGET_NAME)-gfortran
+
+define Package/openblas
+  SECTION:=libs
+  CATEGORY:=Libraries
+  TITLE:=An optimized library for BLAS (Basic Linear Algebra Subprograms)
+  URL:=https://www.openblas.net/
+  DEPENDS:= \
+       @!arc \
+       @!powerpc \
+       +INSTALL_GFORTRAN:libgfortran
+endef
+
+define Package/openblas/description
+  OpenBLAS is an optimized BLAS (Basic Linear Algebra Subprograms) library
+  based on GotoBLAS2 1.13 BSD version.
+endef
+
+define Package/openblas/config
+menu "Configuration"
+depends on PACKAGE_openblas
+
+config OPENBLAS_TARGET_OVERRIDE
+	string
+	prompt "Manual CPU target override (from the OpenBLAS TargetList.txt file)"
+
+endmenu
+endef
+
+OPENBLAS_TARGET=$(call qstrip,$(CONFIG_OPENBLAS_TARGET_OVERRIDE))
+CPU_TYPE=$(call qstrip,$(CONFIG_CPU_TYPE))
+
+ifeq ($(OPENBLAS_TARGET),)
+# initialize to GENERIC as default
+OPENBLAS_TARGET:=GENERIC
+
+ifeq ($(ARCH),aarch64)
+  OPENBLAS_TARGET:=ARMV8
+else ifeq ($(ARCH),arm)
+  OPENBLAS_TARGET:=ARMV5
+else ifeq ($(ARCH),mips)
+  OPENBLAS_TARGET:=MIPS24K
+else ifeq ($(ARCH),mipsel)
+  OPENBLAS_TARGET:=MIPS24K
+else ifeq ($(ARCH),powerpc)
+  OPENBLAS_TARGET:=PPC440
+endif
+endif # ifeq ($(OPENBLAS_TARGET),)
+
+ifeq ($(CONFIG_ARCH_64BIT),y)
+OPENBLAS_BINARY:=64
+else
+OPENBLAS_BINARY:=32
+endif
+
+MAKE_FLAGS += \
+	CC=$(GCC) \
+	FC=$(GFC) \
+	CROSS=1 \
+	HOSTCC=$(HOSTCC_NOCACHE) \
+	CROSS_SUFFIX=$(TARGET_CROSS) \
+	BINARY=$(OPENBLAS_BINARY) \
+	MAKE_NB_JOBS=-1 \
+	NUM_THREADS=2 \
+	PREFIX=/opt \
+	COMMON_OPT="" \
+	TARGET=$(call qstrip,$(OPENBLAS_TARGET))
+
+ifneq ($(CONFIG_INSTALL_GFORTRAN),y)
+MAKE_FLAGS += NOFORTRAN=1
+endif
+
+define Build/Compile
+$(MAKE) -j4 $(MAKE_FLAGS) -C $(PKG_BUILD_DIR) \
+		DESTDIR="$(PKG_INSTALL_DIR)" all
+endef
+
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/opt/lib/pkgconfig
+	$(INSTALL_DIR) $(1)/opt/include
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/* $(1)/opt/lib/
+	$(CP) $(PKG_INSTALL_DIR)/opt/include/* $(1)/opt/include/
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/pkgconfig/* $(1)/opt/lib/pkgconfig/
+endef
+
+define Package/openblas/install
+	$(INSTALL_DIR) $(1)/opt/lib
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/libopenblas*.so* $(1)/opt/lib/
+endef
+
+define Build/Compile
+$(MAKE) $(MAKE_FLAGS) -C $(PKG_BUILD_DIR) \
+		DESTDIR="$(PKG_INSTALL_DIR)" all
+endef
+
+$(eval $(call BuildPackage,openblas))
