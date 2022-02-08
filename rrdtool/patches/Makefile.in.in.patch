@@ -1,0 +1,11 @@
+--- a/po/Makefile.in.in	2019-02-04 22:54:28.000000000 +0900
++++ b/po/Makefile.in.in	2022-02-08 17:10:17.401092541 +0900
+@@ -9,7 +9,7 @@
+ # General Public License and is *not* in the public domain.
+ #
+ # Origin: gettext-0.17
+-GETTEXT_MACRO_VERSION = 0.17
++GETTEXT_MACRO_VERSION = 0.20
+ 
+ PACKAGE = @PACKAGE@
+ VERSION = @VERSION@
