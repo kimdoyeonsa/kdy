@@ -44,5 +44,5 @@ define Build/Compile
 	$(CP)  $(PKG_BUILD_DIR)/ext/modules $(PKG_BUILD_DIR)
 endef
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+LAPACK +openblas,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+openblas +LAPACK +re2c,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
