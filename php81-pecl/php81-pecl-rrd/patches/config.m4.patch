@@ -1,0 +1,11 @@
+--- a/config.m4	2021-04-23 00:01:50.000000000 +0900
++++ b/config.m4	2022-02-08 19:22:30.068795508 +0900
+@@ -26,8 +26,6 @@
+     PHP_EVAL_LIBLINE($LIBRRD_LDFLAGS, RRD_SHARED_LIBADD)
+     PHP_EVAL_INCLINE($LIBRRD_CFLAGS)
+     AC_DEFINE(HAVE_RRDTOOL, 1, [ ])
+-  else
+-    AC_MSG_ERROR(pkgconfig and librrd in version >= 1.3.0 must be installed)
+   fi
+ 
+   dnl rrd_lastupdate_r available in 1.4.0+
