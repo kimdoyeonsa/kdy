@@ -51,7 +51,7 @@ define Build/InstallDev
 	$(INSTALL_DIR) $(1)/opt/include/pango
 	$(CP) $(PKG_INSTALL_DIR)/opt/include/pango-1.0/pango/*.h $(1)/opt/include/pango
 	$(INSTALL_DIR) $(1)/opt/lib
-	$(CP) $(PKG_INSTALL_DIR)/opt/lib/*.so.* $(1)/opt/lib/
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/lib{fribidi,harfbuzz*,pango*}.so* $(1)/opt/lib/
 	$(INSTALL_DIR) $(1)/opt/lib/pkgconfig
 	$(CP) $(PKG_INSTALL_DIR)/opt/lib/pkgconfig/*.pc $(1)/opt/lib/pkgconfig/
 endef
@@ -63,7 +63,7 @@ endef
 
 define Package/libpango/install
 	$(INSTALL_DIR) $(1)/opt/lib
-	$(CP) $(PKG_INSTALL_DIR)/opt/lib/*.so.* $(1)/opt/lib/
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/lib{fribidi,harfbuzz*,pango*}.so* $(1)/opt/lib/
 endef
 
 $(eval $(call BuildPackage,pango))
