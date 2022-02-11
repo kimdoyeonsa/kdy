@@ -1,0 +1,39 @@
+--- a/lua_closure.c	2020-03-10 12:09:39.000000000 +0900
++++ b/lua_closure.c	2022-02-11 21:38:44.970748782 +0900
+@@ -24,10 +24,7 @@
+ #include "php.h"
+ #include "Zend/zend_exceptions.h"
+ 
+-#include "lua.h"                                                                
+ #include "lua_closure.h"
+-#include "lauxlib.h"                                                            
+-#include "lualib.h"
+ 
+ #include "php_lua.h"
+ 
+@@ -39,6 +36,10 @@
+ /** {{{ ARG_INFO
+  *
+  */
++ 
++ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_construct, 0, 0, 0)
++ZEND_END_ARG_INFO()
++ 
+ ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_invoke, 0, 0, 1)
+ 	ZEND_ARG_INFO(0, arg)
+ 	ZEND_ARG_INFO(0, ...)
+@@ -145,10 +146,10 @@
+ /* {{{ lua_class_methods[]
+  */
+ zend_function_entry lua_closure_methods[] = {
+-	PHP_ME(lua_closure, __construct,		NULL,  					ZEND_ACC_PRIVATE|ZEND_ACC_CTOR)
+-	PHP_ME(lua_closure, invoke,				arginfo_lua_invoke,  	ZEND_ACC_PUBLIC)
+-	PHP_MALIAS(lua_closure, __invoke, invoke, arginfo_lua_invoke,	ZEND_ACC_PUBLIC)
+-	PHP_FE_END
++	ZEND_ME(lua_closure, __construct,		arginfo_lua_construct,  					ZEND_ACC_PRIVATE)
++	ZEND_ME(lua_closure, invoke,				arginfo_lua_invoke,  	ZEND_ACC_PUBLIC)
++	ZEND_MALIAS(lua_closure, __invoke, invoke, arginfo_lua_invoke,	ZEND_ACC_PUBLIC)
++	ZEND_FE_END
+ };
+ /* }}} */
+ 

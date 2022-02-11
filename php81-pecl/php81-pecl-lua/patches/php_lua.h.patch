@@ -1,0 +1,16 @@
+--- a/php_lua.h	2020-03-10 12:09:39.000000000 +0900
++++ b/php_lua.h	2022-02-10 21:38:35.132694947 +0900
+@@ -20,9 +20,9 @@
+ #ifndef PHP_LUA_H
+ #define PHP_LUA_H
+ 
+-#include "lua.h"
+-#include "lauxlib.h"
+-#include "lualib.h"
++#include "lua5.4/lua.h"
++#include "lua5.4/lauxlib.h"
++#include "lua5.4/lualib.h"
+ 
+ /* LUA_OK is defined sinc 5.2 */
+ #ifndef LUA_OK
+

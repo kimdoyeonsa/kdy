@@ -1,0 +1,70 @@
+--- a/lua.c	2020-03-10 12:09:39.000000000 +0900
++++ b/lua.c	2022-02-11 11:49:41.383543918 +0900
+@@ -66,9 +66,7 @@
+ /* {{{ lua_module_entry
+ */
+ zend_module_entry lua_module_entry = {
+-#if ZEND_MODULE_API_NO >= 20010901
+ 	STANDARD_MODULE_HEADER,
+-#endif
+ 	"lua",
+ 	NULL,
+ 	PHP_MINIT(lua),
+@@ -76,9 +74,7 @@
+ 	NULL,
+ 	NULL,
+ 	PHP_MINFO(lua),
+-#if ZEND_MODULE_API_NO >= 20010901
+ 	PHP_LUA_VERSION,
+-#endif
+ 	STANDARD_MODULE_PROPERTIES
+ };
+ /* }}} */
+--- a/lua.c	2022-02-11 11:49:41.383543000 +0900
++++ b/lua.c	2022-02-11 19:59:59.643575889 +0900
+@@ -40,6 +40,9 @@
+ 	ZEND_ARG_INFO(0, args)
+ ZEND_END_ARG_INFO()
+ 
++ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_construct, 0, 0, 0)
++ZEND_END_ARG_INFO()
++
+ ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_assign, 0, 0, 2)
+ 	ZEND_ARG_INFO(0, name)
+ 	ZEND_ARG_INFO(0, value)
+@@ -54,6 +57,10 @@
+ 	ZEND_ARG_INFO(0, file)
+ ZEND_END_ARG_INFO()
+ 
++ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_version, 0, 0, 1)
++	ZEND_ARG_INFO(0, getversion)
++ZEND_END_ARG_INFO()
++
+ ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_eval, 0, 0, 1)
+ 	ZEND_ARG_INFO(0, statements)
+ ZEND_END_ARG_INFO()
+@@ -813,15 +820,15 @@
+  *
+  */
+ zend_function_entry lua_class_methods[] = {
+-	PHP_ME(lua, __construct,		NULL,  					ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+-	PHP_ME(lua, eval,          		arginfo_lua_eval,  		ZEND_ACC_PUBLIC)
+-	PHP_ME(lua, include,			arginfo_lua_include, 	ZEND_ACC_PUBLIC)
+-	PHP_ME(lua, call,				arginfo_lua_call,  		ZEND_ACC_PUBLIC)
+-	PHP_ME(lua, assign,				arginfo_lua_assign,		ZEND_ACC_PUBLIC)
+-	PHP_ME(lua, getVersion,			NULL, 					ZEND_ACC_PUBLIC|ZEND_ACC_ALLOW_STATIC)
+-	PHP_ME(lua, registerCallback,	arginfo_lua_register, 	ZEND_ACC_PUBLIC)
+-	PHP_MALIAS(lua, __call, call, 	arginfo_lua_call,		ZEND_ACC_PUBLIC)
+-	PHP_FE_END
++	ZEND_ME(lua, __construct,		arginfo_lua_construct,  					ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, eval,          		arginfo_lua_eval,  		ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, include,			arginfo_lua_include, 	ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, call,				arginfo_lua_call,  		ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, assign,				arginfo_lua_assign,		ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, getVersion,			arginfo_lua_version, 					ZEND_ACC_PUBLIC)
++	ZEND_ME(lua, registerCallback,	arginfo_lua_register, 	ZEND_ACC_PUBLIC)
++	ZEND_MALIAS(lua, __call, call, 	arginfo_lua_call,		ZEND_ACC_PUBLIC)
++	ZEND_FE_END
+ };
+ /* }}} */
+ 

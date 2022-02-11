@@ -1,0 +1,44 @@
+--- a/config.m4	2020-03-10 12:09:39.000000000 +0900
++++ b/config.m4	2022-02-10 20:43:12.486504650 +0900
+@@ -22,9 +22,9 @@
+         break
+       fi
+ 
+-      if test "$PHP_LUA_VERSION" != "yes"; then
+-        if test -r $i/include/lua$PHP_LUA_VERSION/lua.h; then
+-          LUA_INCLUDE_DIR=$i/include/lua$PHP_LUA_VERSION
++      if test "${PHP_LUA_VERSION}" != "yes"; then
++        if test -r $i/include/lua${PHP_LUA_VERSION}/lua.h; then
++          LUA_INCLUDE_DIR=$i/include/lua${PHP_LUA_VERSION}
+           AC_MSG_RESULT(found in a version-specific subdirectory of $i)
+           break
+         fi
+@@ -32,13 +32,8 @@
+     done
+   fi
+ 
+-  if test -z "$LUA_INCLUDE_DIR"; then
+-    AC_MSG_RESULT(not found)
+-    AC_MSG_ERROR(Please reinstall the lua distribution - lua.h should be in <lua-dir>/include/)
+-  fi
+-
+-  if test "$PHP_LUA_VERSION" != "yes" -a "$PHP_LUA_VERSION" != "no"; then
+-    LUA_LIB_SUFFIX=lua$PHP_LUA_VERSION
++  if test "${PHP_LUA_VERSION}" != "yes" -a "${PHP_LUA_VERSION}" != "no"; then
++    LUA_LIB_SUFFIX=lua${PHP_LUA_VERSION}
+   else
+     LUA_LIB_SUFFIX=lua
+   fi
+@@ -58,11 +53,6 @@
+     done
+   fi
+ 
+-  if test -z "$LUA_LIB_DIR"; then
+-    AC_MSG_RESULT(not found)
+-    AC_MSG_ERROR(Please reinstall the lua distribution - lua library should be in <lua-dir>/lib/)
+-  fi
+-
+   PHP_ADD_INCLUDE($LUA_INCLUDE_DIR)
+   PHP_ADD_LIBRARY_WITH_PATH($LUA_LIB_SUFFIX, $LUA_LIB_DIR, LUA_SHARED_LIBADD) 
+   PHP_SUBST(LUA_SHARED_LIBADD)
+
