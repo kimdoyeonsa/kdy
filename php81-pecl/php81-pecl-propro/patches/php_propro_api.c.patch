@@ -1,0 +1,42 @@
+--- a/src/php_propro_api.c	2020-12-02 22:24:04.000000000 +0900
++++ b/src/php_propro_api.c	2022-02-12 21:48:58.016160223 +0900
+@@ -307,7 +307,7 @@
+ 
+ 	if (!Z_ISUNDEF_P(return_value)) {
+ 		ZVAL_DEREF(return_value);
+-		convert_to_explicit_type_ex(return_value, type);
++		convert_to_object_ex(return_value);
+ 		return SUCCESS;
+ 	}
+ 
+@@ -365,7 +365,7 @@
+ 	switch (Z_TYPE_P(container)) {
+ 	case IS_OBJECT:
+ 		ZVAL_UNDEF(&prop_tmp);
+-		found_value = zend_read_property(Z_OBJCE_P(container), container,
++		found_value = zend_read_property(Z_OBJCE_P(container), Z_OBJ_P(container),
+ 				member->val, member->len, 0, &prop_tmp);
+ 		break;
+ 
+@@ -418,7 +418,7 @@
+ 	ZVAL_DEREF(container);
+ 	switch (Z_TYPE_P(container)) {
+ 	case IS_OBJECT:
+-		zend_update_property(Z_OBJCE_P(container), container,
++		zend_update_property(Z_OBJCE_P(container), Z_OBJ_P(container),
+ 				member->val, member->len, value);
+ 		break;
+
+@@ -679,8 +679,8 @@
+ 	php_property_proxy_object_handlers.free_obj = destroy_obj;
+ 	php_property_proxy_object_handlers.get_gc = get_gc;
+ 	php_property_proxy_object_handlers.get_debug_info = get_debug_info;
+-	php_property_proxy_object_handlers.set = set_obj;
+-	php_property_proxy_object_handlers.get = get_obj;
++	php_property_proxy_object_handlers.free_obj = set_obj;
++	php_property_proxy_object_handlers.free_obj = get_obj;
+ 	php_property_proxy_object_handlers.cast_object = cast_obj;
+ 	php_property_proxy_object_handlers.read_dimension = read_dimension;
+ 	php_property_proxy_object_handlers.write_dimension = write_dimension;
+
+ 
