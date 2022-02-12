@@ -39,4 +39,3 @@
  	php_property_proxy_object_handlers.read_dimension = read_dimension;
  	php_property_proxy_object_handlers.write_dimension = write_dimension;
 
- 
