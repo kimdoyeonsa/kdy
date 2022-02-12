@@ -1,0 +1,20 @@
+--- a/dlib/cmake_utils/test_for_libjpeg/CMakeLists.txt	2022-01-25 12:16:28.000000000 +0900
++++ b/dlib/cmake_utils/test_for_libjpeg/CMakeLists.txt	2022-02-11 23:33:38.181390033 +0900
+@@ -5,7 +5,5 @@
+ find_package(JPEG)
+ 
+ include_directories(${JPEG_INCLUDE_DIR})
+-add_executable(libjpeg_test libjpeg_test.cpp)
+-target_link_libraries(libjpeg_test ${JPEG_LIBRARY})
+
+ 
+--- a/dlib/cmake_utils/test_for_libpng/CMakeLists.txt	2022-01-25 12:16:28.000000000 +0900
++++ b/dlib/cmake_utils/test_for_libpng/CMakeLists.txt	2022-02-11 23:32:42.413049548 +0900
+@@ -5,7 +5,5 @@
+ find_package(PNG)
+ 
+ include_directories(${PNG_INCLUDE_DIR})
+-add_executable(libpng_test libpng_test.cpp)
+-target_link_libraries(libpng_test ${PNG_LIBRARIES})
+ 
+  
