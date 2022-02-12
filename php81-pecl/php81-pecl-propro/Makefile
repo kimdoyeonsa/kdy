@@ -17,8 +17,6 @@ PKG_NAME:=php81-pecl-propro
 PKG_SOURCE:=$(PKG_COMMIT).tar.gz
 PKG_SOURCE_URL:=https://github.com/m6w6/ext-propro/archive/
 
-PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
-
 PKG_LICENSE:=BSD-2-Clause
 PKG_LICENSE_FILES:=LICENSE
 
