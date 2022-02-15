@@ -15,9 +15,6 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-GCC=$(REAL_GNU_TARGET_NAME)-gcc
-GFC=$(REAL_GNU_TARGET_NAME)-gfortran
-
 define Package/openblas
   SECTION:=libs
   CATEGORY:=Libraries
@@ -72,8 +69,8 @@ OPENBLAS_BINARY:=32
 endif
 
 MAKE_FLAGS += \
-	CC=$(GCC) \
-	FC=$(GFC) \
+	CC=$(REAL_GNU_TARGET_NAME)-gcc \
+	FC=$(REAL_GNU_TARGET_NAME)-gfortran \
 	CROSS=1 \
 	HOSTCC=$(HOSTCC_NOCACHE) \
 	CROSS_SUFFIX=$(TARGET_CROSS) \
