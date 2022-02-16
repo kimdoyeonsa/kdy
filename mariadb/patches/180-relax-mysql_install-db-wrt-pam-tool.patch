@@ -1,10 +1,12 @@
 --- a/scripts/mysql_install_db.sh
 +++ b/scripts/mysql_install_db.sh
-@@ -358,6 +358,14 @@ then
+@@ -369,7 +369,15 @@
      exit 1
    fi
    plugindir=`find_in_dirs --dir auth_pam.so $basedir/lib*/plugin $basedir/lib*/mysql/plugin $basedir/lib/*/mariadb19/plugin`
-+  # Upstream assumes all plugins will be always installed, but in OpenWrt we can
+-  pamtooldir=$plugindir
++ pamtooldir=$plugindir
++   # Upstream assumes all plugins will be always installed, but in OpenWrt we can
 +  # install a server without plugins if we want to.
 +  if test -z "$plugindir"
 +  then
@@ -12,10 +14,10 @@
 +    echo "Will continue with \"/opt/lib/mariadb/plugin\"." >&2
 +    plugindir=/opt/lib/mariadb/plugin
 +  fi
-   pamtooldir=$plugindir
  # relative from where the script was run for a relocatable install
  elif test -n "$dirname0" -a -x "$rel_mysqld" -a ! "$rel_mysqld" -ef "@sbindir@/mariadbd"
-@@ -478,7 +486,9 @@ do
+ then
+@@ -501,7 +509,9 @@
    fi
  done
  
@@ -26,14 +28,15 @@
  then
    if test -z "$srcdir" -a "$in_rpm" -eq 0
    then
-@@ -499,6 +509,10 @@ then
+@@ -522,6 +532,10 @@
          echo
      fi
    fi
-+fi
++  fi
 +
 +if test -n "$user"
 +then
    args="$args --user=$user"
  fi
  
+

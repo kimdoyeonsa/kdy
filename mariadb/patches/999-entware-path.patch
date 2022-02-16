@@ -125,7 +125,7 @@
  /*
 --- a/scripts/CMakeLists.txt
 +++ b/scripts/CMakeLists.txt
-@@ -186,7 +186,7 @@
+@@ -187,7 +187,7 @@
  # the documentation, so better not change this.
  
  IF(INSTALL_LAYOUT MATCHES "STANDALONE")

@@ -10,7 +10,7 @@ Date:   Fri Dec 21 19:14:04 2018 +0200
 
 --- a/sql/CMakeLists.txt
 +++ b/sql/CMakeLists.txt
-@@ -328,6 +328,11 @@
+@@ -329,6 +329,11 @@
       "${MYSQLD_LINK_FLAGS} ${WITH_MYSQLD_LDFLAGS}")
  ENDIF()
  
