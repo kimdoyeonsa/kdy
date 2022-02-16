@@ -33,7 +33,7 @@ php81_MODULES= \
 	ldap \
 	mbstring mysqli mysqlnd \
 	opcache openssl \
-	pcntl pdo pdo-mysql pdo-pgsql pdo-sqlite pgsql phar \
+	pcntl pdo pdo-mysql pdo-pgsql pdo-dlib pdo-sqlite pgsql phar \
 	session shmop sodium simplexml snmp soap sockets sqlite3 sysvmsg sysvsem sysvshm \
 	tidy tokenizer \
 	xml xmlreader xmlwriter \
@@ -96,7 +96,7 @@ endef
 
 define Package/php81-dev
   $(call Package/php81/Default)
-  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma
+  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma +libfreetds
   TITLE+= (dev)
 endef
 
@@ -410,6 +410,9 @@ endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pdo),)
   CONFIGURE_ARGS+= --enable-pdo=shared
+else
+  CONFIGURE_ARGS+= --disable-pdo
+endif
   ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pdo-mysql),)
     CONFIGURE_ARGS+= --with-pdo-mysql=shared
   else
@@ -420,25 +423,27 @@ ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pdo),)
   else
     CONFIGURE_ARGS+= --without-pdo-pgsql
   endif
+  ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pdo-dblib),)
+    CONFIGURE_ARGS+= --with-pdo-dblib=shared,"$(STAGING_DIR)/opt"
+  else
+    CONFIGURE_ARGS+= --without-pdo-dblib
+  endif
   ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pdo-sqlite),)
     CONFIGURE_ARGS+= --with-pdo-sqlite=shared
   else
     CONFIGURE_ARGS+= --without-pdo-sqlite
   endif
+  
+ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pgsql),)
+  CONFIGURE_ARGS+= --with-pgsql=shared,"$(STAGING_DIR)/opt"
 else
-  CONFIGURE_ARGS+= --disable-pdo
-endif
+  CONFIGURE_ARGS+= --without-pgsql
+endif  
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-xsl),)
   CONFIGURE_ARGS+= --with-xsl=shared,"$(STAGING_DIR)/opt/lib"
 else
   CONFIGURE_ARGS+= --without-xsl
-endif
-
-ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pgsql),)
-  CONFIGURE_ARGS+= --with-pgsql=shared,"$(STAGING_DIR)/opt"
-else
-  CONFIGURE_ARGS+= --without-pgsql
 endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-phar),)
@@ -618,7 +623,6 @@ define Package/php81-dev/install
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/include/php $(1)/opt/include/php81
 	$(INSTALL_DIR) $(1)/opt/lib
 	$(CP) $(PKG_BUILD_DIR)/staging/opt/lib/php $(1)/opt/lib/php81
-	$(CP) $(STAGING_DIR_HOST)/bin/pkg-config* $(1)/opt/bin
 endef
 
 define Package/php81-apache/install
@@ -803,6 +807,7 @@ $(eval $(call BuildModule,openssl,OpenSSL,+PACKAGE_php81-mod-openssl:libopenssl,
 $(eval $(call BuildModule,pcntl,PCNTL))
 $(eval $(call BuildModule,pdo,PHP Data Objects))
 $(eval $(call BuildModule,pdo-mysql,PDO driver for MySQL,+php81-mod-pdo +PACKAGE_php81-mod-pdo-mysql:php81-mod-mysqlnd))
+$(eval $(call BuildModule,pdo-dblib,PDO driver for FreeTDS,+php81-mod-pdo +PACKAGE_php81-mod-pdo-dblib:libfreetds))
 $(eval $(call BuildModule,pdo-pgsql,PDO driver for PostgreSQL,+php81-mod-pdo +PACKAGE_php81-mod-pdo-pgsql:libpq))
 $(eval $(call BuildModule,pdo-sqlite,PDO driver for SQLite 3.x,+php81-mod-pdo +PACKAGE_php81-mod-pdo-sqlite:libsqlite3 +PACKAGE_php81-mod-pdo-sqlite:librt))
 $(eval $(call BuildModule,pgsql,PostgreSQL,+PACKAGE_php81-mod-pgsql:libpq))
