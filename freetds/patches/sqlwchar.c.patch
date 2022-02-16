@@ -1,0 +1,10 @@
+--- a/src/odbc/sqlwchar.c	2021-06-04 21:12:01.000000000 +0900
++++ b/src/odbc/sqlwchar.c	2022-02-16 16:42:40.465931447 +0900
+@@ -101,7 +101,6 @@
+ #  define ODBC_WIDE_CANONIC TDS_CHARSET_UCS_4LE
+ # endif
+ #else
+-#error SIZEOF_SQLWCHAR not supported !!
+ #endif
+ 
+ int odbc_get_wide_canonic(TDSCONNECTION *conn)
