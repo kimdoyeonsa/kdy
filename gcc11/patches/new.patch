@@ -1,0 +1,32 @@
+--- a/libstdc++-v3/libsupc++/new	2021-07-28 15:55:09.332315000 +0900
++++ b/libstdc++-v3/libsupc++/new	2022-01-03 21:54:42.592961104 +0900
+@@ -85,9 +85,7 @@
+   };
+ #endif
+ 
+-#if __cpp_aligned_new
+   enum class align_val_t: size_t {};
+-#endif
+ 
+   struct nothrow_t
+   {
+@@ -145,7 +143,7 @@
+   __attribute__((__externally_visible__));
+ void operator delete[](void*, const std::nothrow_t&) _GLIBCXX_USE_NOEXCEPT
+   __attribute__((__externally_visible__));
+-#if __cpp_aligned_new
++
+ _GLIBCXX_NODISCARD void* operator new(std::size_t, std::align_val_t)
+   __attribute__((__externally_visible__, __alloc_size__ (1), __malloc__));
+ _GLIBCXX_NODISCARD void* operator new(std::size_t, std::align_val_t, const std::nothrow_t&)
+@@ -168,7 +166,7 @@
+ void operator delete[](void*, std::size_t, std::align_val_t)
+   _GLIBCXX_USE_NOEXCEPT __attribute__((__externally_visible__));
+ #endif // __cpp_sized_deallocation
+-#endif // __cpp_aligned_new
++ // __cpp_aligned_new
+ 
+ // Default placement versions of operator new.
+ _GLIBCXX_NODISCARD inline void* operator new(std::size_t, void* __p) _GLIBCXX_USE_NOEXCEPT
+
+

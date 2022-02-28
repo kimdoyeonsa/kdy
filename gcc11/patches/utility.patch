@@ -1,0 +1,67 @@
+--- a/libstdc++-v3/include/std/utility	2022-01-04 17:31:07.139613745 +0900
++++ b/libstdc++-v3/include/std/utility	2022-01-04 17:31:46.763215213 +0900
+@@ -286,34 +282,36 @@
+ 
+   /// Assign @p __new_val to @p __obj and return its previous value.
+   template <typename _Tp, typename _Up = _Tp>
+-    _GLIBCXX20_CONSTEXPR
+     inline _Tp
+     exchange(_Tp& __obj, _Up&& __new_val)
+     { return std::__exchange(__obj, std::forward<_Up>(__new_val)); }
+-
+-#endif // C++14
++#endif
+ 
+   // Stores a tuple of indices.  Used by tuple and pair, and by bind() to
+   // extract the elements in a tuple.
+   template<size_t... _Indexes> struct _Index_tuple { };
+ 
++#ifdef __has_builtin
++# if __has_builtin(__make_integer_seq)
++#  define _GLIBCXX_USE_MAKE_INTEGER_SEQ 1
++# endif
++#endif
++
+   // Builds an _Index_tuple<0, 1, 2, ..., _Num-1>.
+   template<size_t _Num>
+     struct _Build_index_tuple
+     {
+-#if __has_builtin(__make_integer_seq)
++#if _GLIBCXX_USE_MAKE_INTEGER_SEQ
+       template<typename, size_t... _Indices>
+         using _IdxTuple = _Index_tuple<_Indices...>;
+ 
+-      // Clang defines __make_integer_seq for this purpose.
+       using __type = __make_integer_seq<_IdxTuple, size_t, _Num>;
+ #else
+-      // For GCC and other compilers, use __integer_pack instead.
+       using __type = _Index_tuple<__integer_pack(_Num)...>;
+ #endif
+     };
+ 
+-#if __cplusplus >= 201402L
++#if __cplusplus > 201103L
+ 
+ #define __cpp_lib_integer_sequence 201304
+ 
+@@ -328,12 +326,14 @@
+   /// Alias template make_integer_sequence
+   template<typename _Tp, _Tp _Num>
+     using make_integer_sequence
+-#if __has_builtin(__make_integer_seq)
++#if _GLIBCXX_USE_MAKE_INTEGER_SEQ
+       = __make_integer_seq<integer_sequence, _Tp, _Num>;
+ #else
+       = integer_sequence<_Tp, __integer_pack(_Num)...>;
+ #endif
+ 
++#undef _GLIBCXX_USE_MAKE_INTEGER_SEQ
++
+   /// Alias template index_sequence
+   template<size_t... _Idx>
+     using index_sequence = integer_sequence<size_t, _Idx...>;
+
+ #endif // C++17
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION
+

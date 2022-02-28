@@ -1,0 +1,319 @@
+--- a/libstdc++-v3/include/bits/c++config	2021-07-28 15:55:09.280315000 +0900
++++ b/libstdc++-v3/include/bits/c++config	2021-12-30 11:05:08.845729683 +0900
+@@ -75,20 +75,22 @@
+ #endif
+ 
+ // Macros for deprecated attributes.
+-//   _GLIBCXX_USE_DEPRECATED
+-//   _GLIBCXX_DEPRECATED
+-//   _GLIBCXX_DEPRECATED_SUGGEST( string-literal )
++//   _GLIBCXX_DEPRECATED_SUGGEST( stringliteral )
+ //   _GLIBCXX11_DEPRECATED
+-//   _GLIBCXX11_DEPRECATED_SUGGEST( string-literal )
++//   _GLIBCXX11_DEPRECATED_SUGGEST( stringliteral )
++//   _GLIBCXX_DEPRECATED_SUGGEST
+ //   _GLIBCXX17_DEPRECATED
+-//   _GLIBCXX17_DEPRECATED_SUGGEST( string-literal )
+-//   _GLIBCXX20_DEPRECATED( string-literal )
+-//   _GLIBCXX20_DEPRECATED_SUGGEST( string-literal )
++//   _GLIBCXX17_DEPRECATED_SUGGEST( stringliteral )
++//   _GLIBCXX20_DEPRECATED( stringliteral )
++//   _GLIBCXX20_DEPRECATED_SUGGEST( stringliteral )
++ #ifndef _GLIBCXX_USE_DEPRECATED
++ # define _GLIBCXX_USE_DEPRECATED 1
++ #endif
+ #ifndef _GLIBCXX_USE_DEPRECATED
+ # define _GLIBCXX_USE_DEPRECATED 1
+ #endif
+ 
+-#if defined(__DEPRECATED)
++#if defined(__DEPRECATED) && (__cplusplus >= 201103L)
+ # define _GLIBCXX_DEPRECATED __attribute__ ((__deprecated__))
+ # define _GLIBCXX_DEPRECATED_SUGGEST(ALT) \
+   __attribute__ ((__deprecated__ ("use '" ALT "' instead")))
+@@ -99,26 +101,20 @@
+ 
+ #if defined(__DEPRECATED) && (__cplusplus >= 201103L)
+ # define _GLIBCXX11_DEPRECATED _GLIBCXX_DEPRECATED
+-# define _GLIBCXX11_DEPRECATED_SUGGEST(ALT) _GLIBCXX_DEPRECATED_SUGGEST(ALT)
+ #else
+ # define _GLIBCXX11_DEPRECATED
+-# define _GLIBCXX11_DEPRECATED_SUGGEST(ALT)
+ #endif
+ 
+ #if defined(__DEPRECATED) && (__cplusplus >= 201703L)
+ # define _GLIBCXX17_DEPRECATED [[__deprecated__]]
+-# define _GLIBCXX17_DEPRECATED_SUGGEST(ALT) _GLIBCXX_DEPRECATED_SUGGEST(ALT)
+ #else
+ # define _GLIBCXX17_DEPRECATED
+-# define _GLIBCXX17_DEPRECATED_SUGGEST(ALT)
+ #endif
+ 
+ #if defined(__DEPRECATED) && (__cplusplus > 201703L)
+ # define _GLIBCXX20_DEPRECATED(MSG) [[deprecated(MSG)]]
+-# define _GLIBCXX20_DEPRECATED_SUGGEST(ALT) _GLIBCXX_DEPRECATED_SUGGEST(ALT)
+ #else
+ # define _GLIBCXX20_DEPRECATED(MSG)
+-# define _GLIBCXX20_DEPRECATED_SUGGEST(ALT)
+ #endif
+ 
+ // Macros for ABI tag attributes.
+@@ -426,30 +422,7 @@
+ // Define if compatibility should be provided for -mlong-double-64.
+ #undef _GLIBCXX_LONG_DOUBLE_COMPAT
+ 
+-// Define if compatibility should be provided for alternative 128-bit long
+-// double formats. Not possible for Clang until __ibm128 is supported.
+-#ifndef __clang__
+-#undef _GLIBCXX_LONG_DOUBLE_ALT128_COMPAT
+-#endif
+-
+-// Inline namespaces for long double 128 modes.
+-#if defined _GLIBCXX_LONG_DOUBLE_ALT128_COMPAT \
+-  && defined __LONG_DOUBLE_IEEE128__
+-namespace std
+-{
+-  // Namespaces for 128-bit IEEE long double format on 64-bit POWER LE.
+-  inline namespace __gnu_cxx_ieee128 { }
+-  inline namespace __gnu_cxx11_ieee128 { }
+-}
+-# define _GLIBCXX_NAMESPACE_LDBL __gnu_cxx_ieee128::
+-# define _GLIBCXX_BEGIN_NAMESPACE_LDBL namespace __gnu_cxx_ieee128 {
+-# define _GLIBCXX_END_NAMESPACE_LDBL }
+-# define _GLIBCXX_NAMESPACE_LDBL_OR_CXX11 __gnu_cxx11_ieee128::
+-# define _GLIBCXX_BEGIN_NAMESPACE_LDBL_OR_CXX11 namespace __gnu_cxx11_ieee128 {
+-# define _GLIBCXX_END_NAMESPACE_LDBL_OR_CXX11 }
+-
+-#else // _GLIBCXX_LONG_DOUBLE_ALT128_COMPAT && IEEE128
+-
++// Inline namespace for long double 128 mode.
+ #if defined _GLIBCXX_LONG_DOUBLE_COMPAT && defined __LONG_DOUBLE_128__
+ namespace std
+ {
+@@ -463,7 +436,6 @@
+ # define _GLIBCXX_BEGIN_NAMESPACE_LDBL
+ # define _GLIBCXX_END_NAMESPACE_LDBL
+ #endif
+-
+ #if _GLIBCXX_USE_CXX11_ABI
+ # define _GLIBCXX_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_NAMESPACE_CXX11
+ # define _GLIBCXX_BEGIN_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -474,8 +446,6 @@
+ # define _GLIBCXX_END_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_END_NAMESPACE_LDBL
+ #endif
+ 
+-#endif // _GLIBCXX_LONG_DOUBLE_ALT128_COMPAT && IEEE128
+-
+ // Debug Mode implies checking assertions.
+ #if defined(_GLIBCXX_DEBUG) && !defined(_GLIBCXX_ASSERTIONS)
+ # define _GLIBCXX_ASSERTIONS 1
+@@ -487,16 +457,6 @@
+ # define _GLIBCXX_EXTERN_TEMPLATE -1
+ #endif
+ 
+-
+-#if __has_builtin(__builtin_is_constant_evaluated)
+-# define __glibcxx_constexpr_assert(cond) \
+-  if (__builtin_is_constant_evaluated() && !bool(cond))	\
+-    __builtin_unreachable() /* precondition violation detected! */
+-#else
+-# define __glibcxx_constexpr_assert(unevaluated)
+-#endif
+-
+-
+ // Assert.
+ #if defined(_GLIBCXX_ASSERTIONS) \
+   || defined(_GLIBCXX_PARALLEL) || defined(_GLIBCXX_PARALLEL_ASSERTIONS)
+@@ -504,8 +464,7 @@
+ {
+   // Avoid the use of assert, because we're trying to keep the <cassert>
+   // include out of the mix.
+-  extern "C++" _GLIBCXX_NORETURN
+-  inline void
++  extern "C++" inline void
+   __replacement_assert(const char* __file, int __line,
+ 		       const char* __function, const char* __condition)
+   {
+@@ -514,21 +473,19 @@
+     __builtin_abort();
+   }
+ }
+-#define __glibcxx_assert_impl(_Condition)			       \
+-  if (__builtin_expect(!bool(_Condition), false))		       \
+-  {								       \
+-    __glibcxx_constexpr_assert(_Condition);			       \
+-    std::__replacement_assert(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
+-			      #_Condition);			       \
+-  }
++#define __glibcxx_assert_impl(_Condition)				 \
++  do 									 \
++  {							      		 \
++    if (! (_Condition))                                                  \
++      std::__replacement_assert(__FILE__, __LINE__, __PRETTY_FUNCTION__, \
++				#_Condition);				 \
++  } while (false)
+ #endif
+ 
+ #if defined(_GLIBCXX_ASSERTIONS)
+-# define __glibcxx_assert(cond) \
+-  do { __glibcxx_assert_impl(cond); } while (false)
++# define __glibcxx_assert(_Condition) __glibcxx_assert_impl(_Condition)
+ #else
+-# define __glibcxx_assert(cond) \
+-  do { __glibcxx_constexpr_assert(cond); } while (false)
++# define __glibcxx_assert(_Condition)
+ #endif
+ 
+ // Macros for race detectors.
+@@ -565,15 +522,6 @@
+ 
+ #define _GLIBCXX_USE_ALLOCATOR_NEW
+ 
+-#ifdef __SIZEOF_INT128__
+-#if ! defined __GLIBCXX_TYPE_INT_N_0 && ! defined __STRICT_ANSI__
+-// If __int128 is supported, we expect __GLIBCXX_TYPE_INT_N_0 to be defined
+-// unless the compiler is in strict mode. If it's not defined and the strict
+-// macro is not defined, something is wrong.
+-#warning "__STRICT_ANSI__ seems to have been undefined; this is not supported"
+-#endif
+-#endif
+-
+ #else // !__cplusplus
+ # define _GLIBCXX_BEGIN_EXTERN_C
+ # define _GLIBCXX_END_EXTERN_C
+@@ -698,59 +646,38 @@
+ # define __cpp_lib_char8_t 201907L
+ #endif
+ 
+-/* Define if __float128 is supported on this host.  */
++/* Define if __float128 is supported on this host. */
+ #if defined(__FLOAT128__) || defined(__SIZEOF_FLOAT128__)
+-/* For powerpc64 don't use __float128 when it's the same type as long double. */
+-# if !(defined(_GLIBCXX_LONG_DOUBLE_ALT128_COMPAT) && defined(__LONG_DOUBLE_IEEE128__))
+-#  define _GLIBCXX_USE_FLOAT128
+-# endif
+-#endif
+-
+-// Define if float has the IEEE binary32 format.
+-#if __FLT_MANT_DIG__ == 24 \
+-  && __FLT_MIN_EXP__ == -125 \
+-  && __FLT_MAX_EXP__ == 128
+-# define _GLIBCXX_FLOAT_IS_IEEE_BINARY32 1
+-#endif
+-
+-// Define if double has the IEEE binary64 format.
+-#if __DBL_MANT_DIG__ == 53 \
+-  && __DBL_MIN_EXP__ == -1021 \
+-  && __DBL_MAX_EXP__ == 1024
+-# define _GLIBCXX_DOUBLE_IS_IEEE_BINARY64 1
++#define _GLIBCXX_USE_FLOAT128
+ #endif
+ 
+-#ifdef __has_builtin
+-# ifdef __is_identifier
+-// Intel and older Clang require !__is_identifier for some built-ins:
+-#  define _GLIBCXX_HAS_BUILTIN(B) __has_builtin(B) || ! __is_identifier(B)
+-# else
+-#  define _GLIBCXX_HAS_BUILTIN(B) __has_builtin(B)
+-# endif
+-#endif
+-
+-#if _GLIBCXX_HAS_BUILTIN(__has_unique_object_representations)
++#if __GNUC__ >= 7
++// Assume these are available if the compiler claims to be a recent GCC:
+ # define _GLIBCXX_HAVE_BUILTIN_HAS_UNIQ_OBJ_REP 1
+-#endif
+-
+-#if _GLIBCXX_HAS_BUILTIN(__is_aggregate)
+ # define _GLIBCXX_HAVE_BUILTIN_IS_AGGREGATE 1
+-#endif
+-
+-#if _GLIBCXX_HAS_BUILTIN(__builtin_is_constant_evaluated)
+-#  define _GLIBCXX_HAVE_BUILTIN_IS_CONSTANT_EVALUATED 1
+-#endif
+-
+-#if _GLIBCXX_HAS_BUILTIN(__is_same)
+-#  define _GLIBCXX_HAVE_BUILTIN_IS_SAME 1
+-#endif
+-
+-#if _GLIBCXX_HAS_BUILTIN(__builtin_launder)
+ # define _GLIBCXX_HAVE_BUILTIN_LAUNDER 1
+-#endif
+-
+-#undef _GLIBCXX_HAS_BUILTIN
+-
++# define _GLIBCXX_BUILTIN_IS_SAME_AS(T, U) __is_same_as(T, U)
++# if __GNUC__ >= 9
++#  define _GLIBCXX_HAVE_BUILTIN_IS_CONSTANT_EVALUATED 1
++# endif
++#elif defined(__is_identifier) && defined(__has_builtin)
++// For non-GNU compilers:
++# if ! __is_identifier(__has_unique_object_representations)
++#  define _GLIBCXX_HAVE_BUILTIN_HAS_UNIQ_OBJ_REP 1
++# endif
++# if ! __is_identifier(__is_aggregate)
++#  define _GLIBCXX_HAVE_BUILTIN_IS_AGGREGATE 1
++# endif
++# if __has_builtin(__builtin_launder)
++#  define _GLIBCXX_HAVE_BUILTIN_LAUNDER 1
++# endif
++# if __has_builtin(__builtin_is_constant_evaluated)
++#  define _GLIBCXX_HAVE_BUILTIN_IS_CONSTANT_EVALUATED 1
++# endif
++# if ! __is_identifier(__is_same)
++#  define _GLIBCXX_BUILTIN_IS_SAME_AS(T, U) __is_same(T, U)
++# endif
++#endif // GCC
+ 
+ // PSTL configuration
+ 
+--- a/libstdc++-v3/include/backward/binders.h	2021-07-28 15:55:09.276315000 +0900
++++ b/libstdc++-v3/include/backward/binders.h	2022-02-26 17:38:33.854622982 +0900
+@@ -127,7 +127,7 @@
+       typename _Operation::result_type
+       operator()(typename _Operation::second_argument_type& __x) const
+       { return op(value, __x); }
+-    } _GLIBCXX11_DEPRECATED_SUGGEST("std::bind");
++    } _GLIBCXX11_DEPRECATED;
+ 
+   /// One of the @link binders binder functors@endlink.
+   template<typename _Operation, typename _Tp>
+@@ -162,7 +162,7 @@
+       typename _Operation::result_type
+       operator()(typename _Operation::first_argument_type& __x) const
+       { return op(__x, value); }
+-    } _GLIBCXX11_DEPRECATED_SUGGEST("std::bind");
++    } _GLIBCXX11_DEPRECATED;
+ 
+   /// One of the @link binders binder functors@endlink.
+   template<typename _Operation, typename _Tp>
+--- a/libstdc++-v3/include/backward/auto_ptr.h	2022-02-26 18:06:22.559994919 +0900
++++ b/libstdc++-v3/include/backward/auto_ptr.h	2022-02-26 18:11:11.865624801 +0900
+@@ -51,7 +51,7 @@
+       
+       explicit
+       auto_ptr_ref(_Tp1* __p): _M_ptr(__p) { }
+-    } _GLIBCXX11_DEPRECATED;
++    } _GLIBCXX11_DEPRECATED;
+ 
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+@@ -284,7 +284,7 @@
+       template<typename _Tp1>
+         operator auto_ptr<_Tp1>() throw()
+         { return auto_ptr<_Tp1>(this->release()); }
+-    } _GLIBCXX11_DEPRECATED_SUGGEST("std::unique_ptr");
++    } _GLIBCXX11_DEPRECATED;
+ 
+   // _GLIBCXX_RESOLVE_LIB_DEFECTS
+   // 541. shared_ptr template assignment and void
+@@ -293,7 +293,7 @@
+     {
+     public:
+       typedef void element_type;
+-    } _GLIBCXX11_DEPRECATED;
++    } _GLIBCXX11_DEPRECATED;
+ 
+ #if __cplusplus >= 201103L
+   template<_Lock_policy _Lp>
+

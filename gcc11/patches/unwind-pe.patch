@@ -1,0 +1,10 @@
+--- a/libgcc/unwind-pe.h	2021-07-28 15:55:08.816308000 +0900
++++ b/libgcc/unwind-pe.h	2022-01-01 12:06:41.720309776 +0900
+@@ -178,7 +178,6 @@
+    by base_of_encoded_value for this encoding in the appropriate context.  */
+ 
+ #pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+ 
+ static const unsigned char *
+ read_encoded_value_with_base (unsigned char encoding, _Unwind_Ptr base,

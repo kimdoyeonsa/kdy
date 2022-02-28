@@ -1,0 +1,11 @@
+--- a/libitm/beginend.cc	2021-06-01 16:53:06.644498000 +0900
++++ b/libitm/beginend.cc	2021-12-30 22:45:55.579198884 +0900
+@@ -434,7 +434,7 @@
+ 
+   /* FIXME!  Assignment of an aatree like alloc_actions is unsafe; if either
+    *this or *tx is destroyed, the other ends up pointing to a freed node.  */
+-#pragma GCC diagnostic warning "-Wdeprecated-copy"
++
+   alloc_actions = tx->alloc_actions;
+ 
+   user_actions_size = tx->user_actions.size();

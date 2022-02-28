@@ -1,0 +1,78 @@
+--- a/libstdc++-v3/src/c++98/Makefile.am	2021-06-01 16:53:06.880501000 +0900
++++ b/libstdc++-v3/src/c++98/Makefile.am	2021-05-14 17:42:11.000000000 +0900
+@@ -179,13 +179,13 @@
+ 
+ # XXX TODO move locale_init.cc and localename.cc to src/c++11
+ locale_init.lo: locale_init.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ locale_init.o: locale_init.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ localename.lo: localename.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ localename.o: localename.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ 
+ # Use special rules for the deprecated source files so that they find
+ # deprecated include files.
+--- a/libstdc++-v3/src/c++98/Makefile.in	2021-06-01 16:53:06.880501000 +0900
++++ b/libstdc++-v3/src/c++98/Makefile.in	2021-05-14 17:42:11.000000000 +0900
+@@ -891,13 +809,13 @@
+ 
+ # XXX TODO move locale_init.cc and localename.cc to src/c++11
+ locale_init.lo: locale_init.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ locale_init.o: locale_init.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ localename.lo: localename.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ localename.o: localename.cc
+-	$(LTCXXCOMPILE) -std=gnu++11 -fchar8_t -c $<
++	$(LTCXXCOMPILE) -std=gnu++11 -c $<
+ strstream.lo: strstream.cc
+ 	$(LTCXXCOMPILE) -I$(GLIBCXX_INCLUDE_DIR)/backward -Wno-deprecated -c $<
+ strstream.o: strstream.cc
+--- a/libstdc++-v3/src/c++11/Makefile.am	2021-06-01 16:53:06.880501000 +0900
++++ b/libstdc++-v3/src/c++11/Makefile.am	2021-05-14 17:42:11.000000000 +0900
+@@ -126,16 +126,6 @@
+ hashtable_c++0x.o: hashtable_c++0x.cc
+ 	$(CXXCOMPILE) -fimplicit-templates -c $<
+ 
+-# Use special rules for source files that require -fchar8_t.
+-codecvt.lo: codecvt.cc
+-	$(LTCXXCOMPILE) -fchar8_t -c $<
+-codecvt.o: codecvt.cc
+-	$(CXXCOMPILE) -fchar8_t -c $<
+-limits.lo: limits.cc
+-	$(LTCXXCOMPILE) -fchar8_t -c $<
+-limits.o: limits.cc
+-	$(CXXCOMPILE) -fchar8_t -c $<
+-
+ if ENABLE_DUAL_ABI
+ # Rewrite the type info for __ios_failure.
+ rewrite_ios_failure_typeinfo = sed -e '/^_*_ZTISt13__ios_failure:/,/_ZTVN10__cxxabiv120__si_class_type_infoE/s/_ZTVN10__cxxabiv120__si_class_type_infoE/_ZTVSt19__iosfail_type_info/'
+--- a/libstdc++-v3/src/c++11/Makefile.in	2021-06-01 16:53:06.880501000 +0900
++++ b/libstdc++-v3/src/c++11/Makefile.in	2021-05-14 17:42:11.000000000 +0900
+@@ -841,16 +759,6 @@
+ hashtable_c++0x.o: hashtable_c++0x.cc
+ 	$(CXXCOMPILE) -fimplicit-templates -c $<
+ 
+-# Use special rules for source files that require -fchar8_t.
+-codecvt.lo: codecvt.cc
+-	$(LTCXXCOMPILE) -fchar8_t -c $<
+-codecvt.o: codecvt.cc
+-	$(CXXCOMPILE) -fchar8_t -c $<
+-limits.lo: limits.cc
+-	$(LTCXXCOMPILE) -fchar8_t -c $<
+-limits.o: limits.cc
+-	$(CXXCOMPILE) -fchar8_t -c $<
+-
+ @ENABLE_DUAL_ABI_TRUE@cxx11-ios_failure-lt.s: cxx11-ios_failure.cc
+ @ENABLE_DUAL_ABI_TRUE@	$(LTCXXCOMPILE) -gno-as-loc-support -S $< -o tmp-cxx11-ios_failure-lt.s
+ @ENABLE_DUAL_ABI_TRUE@	-test -f tmp-cxx11-ios_failure-lt.o && mv -f tmp-cxx11-ios_failure-lt.o tmp-cxx11-ios_failure-lt.s

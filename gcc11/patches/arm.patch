@@ -1,0 +1,31 @@
+--- a/libgcc/config/arm/unwind-arm.c	2021-07-28 15:55:08.756307000 +0900
++++ b/libgcc/config/arm/unwind-arm.c	2021-05-14 17:42:10.000000000 +0900
+@@ -21,7 +21,6 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#pragma GCC target ("general-regs-only")
+ #include "unwind.h"
+ 
+ /* Misc constants.  */
+--- a/libgcc/config/arm/pr-support.c	2021-07-28 15:55:08.756307000 +0900
++++ b/libgcc/config/arm/pr-support.c	2021-12-29 22:58:48.265230757 +0900
+@@ -21,7 +21,6 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
+-#pragma GCC target ("general-regs-only")
+ #include "unwind.h"
+ 
+ /* We add a prototype for abort here to avoid creating a dependency on
+--- a/libgcc/unwind-c.c	2021-12-29 23:29:44.541143687 +0900
++++ b/libgcc/unwind-c.c	2021-12-29 23:30:01.445513875 +0900
+@@ -106,7 +106,6 @@
+ 		      struct _Unwind_Context *);
+ 
+ _Unwind_Reason_Code
+-__attribute__((target ("general-regs-only")))
+ PERSONALITY_FUNCTION (_Unwind_State state,
+ 		      struct _Unwind_Exception * ue_header,
+ 		      struct _Unwind_Context * context)
+

@@ -1,0 +1,17 @@
+--- a/libstdc++-v3/include/std/bit	2021-07-28 15:55:09.320315000 +0900
++++ b/libstdc++-v3/include/std/bit	2022-01-02 17:42:55.110691941 +0900
+@@ -65,12 +65,11 @@
+    * @{
+    */
+ 
+-#if __cplusplus > 201703l && __has_builtin(__builtin_bit_cast)
++#if __cplusplus > 201703L
+ #define __cpp_lib_bit_cast 201806L
+ 
+   /// Create a value of type `To` from the bits of `from`.
+   template<typename _To, typename _From>
+-    [[nodiscard]]
+     constexpr _To
+     bit_cast(const _From& __from) noexcept
+     {
+

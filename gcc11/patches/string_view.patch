@@ -1,0 +1,294 @@
+--- a/libstdc++-v3/include/std/string_view	2021-07-28 15:55:09.324315000 +0900
++++ b/libstdc++-v3/include/std/string_view	2021-06-01 16:53:06.868501000 +0900
+@@ -37,25 +37,17 @@
+ 
+ #if __cplusplus >= 201703L
+ 
++#include <limits>
+ #include <iosfwd>
+ #include <bits/char_traits.h>
+ #include <bits/functional_hash.h>
+ #include <bits/range_access.h>
+-#include <bits/ostream_insert.h>
+-#include <ext/numeric_traits.h>
+-
+-#if __cplusplus >= 202002L
+-# include <bits/ranges_base.h>
+-#endif
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+-# define __cpp_lib_string_view 201803L
+-#if __cplusplus > 201703L
+-# define __cpp_lib_constexpr_string_view 201811L
+-#endif
++#define __cpp_lib_string_view 201803
+ 
+   // Helper for basic_string and basic_string_view members.
+   constexpr size_t
+@@ -138,35 +130,6 @@
+       : _M_len{__len}, _M_str{__str}
+       { }
+ 
+-#if __cplusplus >= 202002L && __cpp_lib_concepts
+-      template<contiguous_iterator _It, sized_sentinel_for<_It> _End>
+-	requires same_as<iter_value_t<_It>, _CharT>
+-	  && (!convertible_to<_End, size_type>)
+-	constexpr
+-	basic_string_view(_It __first, _End __last)
+-	: _M_len(__last - __first), _M_str(std::to_address(__first))
+-	{ }
+-
+-#if __cplusplus > 202002L
+-      template<typename _Range, typename _DRange = remove_cvref_t<_Range>>
+-	requires (!is_same_v<_DRange, basic_string_view>)
+-	  && ranges::contiguous_range<_Range>
+-	  && ranges::sized_range<_Range>
+-	  && is_same_v<ranges::range_value_t<_Range>, _CharT>
+-	  && (!is_convertible_v<_Range, const _CharT*>)
+-	  && (!requires (_DRange& __d) {
+-		__d.operator ::std::basic_string_view<_CharT, _Traits>();
+-	      })
+-	  && (!requires { typename _DRange::traits_type; }
+-	      || is_same_v<typename _DRange::traits_type, _Traits>)
+-	constexpr
+-	basic_string_view(_Range&& __r)
+-	noexcept(noexcept(ranges::size(__r)) && noexcept(ranges::data(__r)))
+-	: _M_len(ranges::size(__r)), _M_str(ranges::data(__r))
+-	{ }
+-#endif // C++23
+-#endif // C++20
+-
+       constexpr basic_string_view&
+       operator=(const basic_string_view&) noexcept = default;
+ 
+@@ -286,7 +249,6 @@
+ 
+       // [string.view.ops], string operations:
+ 
+-      _GLIBCXX20_CONSTEXPR
+       size_type
+       copy(_CharT* __str, size_type __n, size_type __pos = 0) const
+       {
+@@ -361,10 +323,8 @@
+       constexpr bool
+       ends_with(basic_string_view __x) const noexcept
+       {
+-	const auto __len = this->size();
+-	const auto __xlen = __x.size();
+-	return __len >= __xlen
+-	  && traits_type::compare(end() - __xlen, __x.data(), __xlen) == 0;
++	return this->size() >= __x.size()
++	    && this->compare(this->size() - __x.size(), npos, __x) == 0;
+       }
+ 
+       constexpr bool
+@@ -376,21 +336,6 @@
+       { return this->ends_with(basic_string_view(__x)); }
+ #endif // C++20
+ 
+-#if __cplusplus > 202002L
+-#define __cpp_lib_string_contains 202011L
+-      constexpr bool
+-      contains(basic_string_view __x) const noexcept
+-      { return this->find(__x) != npos; }
+-
+-      constexpr bool
+-      contains(_CharT __x) const noexcept
+-      { return this->find(__x) != npos; }
+-
+-      constexpr bool
+-      contains(const _CharT* __x) const noexcept
+-      { return this->find(__x) != npos; }
+-#endif // C++23
+-
+       // [string.view.find], searching
+ 
+       constexpr size_type
+@@ -498,12 +443,11 @@
+       static constexpr int
+       _S_compare(size_type __n1, size_type __n2) noexcept
+       {
+-	using __limits = __gnu_cxx::__int_traits<int>;
+ 	const difference_type __diff = __n1 - __n2;
+-	if (__diff > __limits::__max)
+-	  return __limits::__max;
+-	if (__diff < __limits::__min)
+-	  return __limits::__min;
++	if (__diff > std::numeric_limits<int>::max())
++	  return std::numeric_limits<int>::max();
++	if (__diff < std::numeric_limits<int>::min())
++	  return std::numeric_limits<int>::min();
+ 	return static_cast<int>(__diff);
+       }
+ 
+@@ -511,23 +455,16 @@
+       const _CharT* _M_str;
+     };
+ 
+-#if __cplusplus > 201703L && __cpp_lib_concepts && __cpp_deduction_guides
+-  template<contiguous_iterator _It, sized_sentinel_for<_It> _End>
+-    basic_string_view(_It, _End) -> basic_string_view<iter_value_t<_It>>;
+-
+-#if __cplusplus > 202002L
+-  template<ranges::contiguous_range _Range>
+-    basic_string_view(_Range&&)
+-      -> basic_string_view<ranges::range_value_t<_Range>>;
+-#endif
+-#endif
+-
+   // [string.view.comparison], non-member basic_string_view comparison function
+ 
+-  // Several of these functions use type_identity_t to create a non-deduced
+-  // context, so that only one argument participates in template argument
+-  // deduction and the other argument gets implicitly converted to the deduced
+-  // type (see N3766).
++  namespace __detail
++  {
++    // Identity transform to create a non-deduced context, so that only one
++    // argument participates in template argument deduction and the other
++    // argument gets implicitly converted to the deduced type. See n3766.html.
++    template<typename _Tp>
++      using __idt = common_type_t<_Tp>;
++  }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+@@ -538,29 +475,12 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator==(basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return __x.size() == __y.size() && __x.compare(__y) == 0; }
+ 
+-#if __cpp_lib_three_way_comparison
+-  template<typename _CharT, typename _Traits>
+-    constexpr auto
+-    operator<=>(basic_string_view<_CharT, _Traits> __x,
+-		basic_string_view<_CharT, _Traits> __y) noexcept
+-    -> decltype(__detail::__char_traits_cmp_cat<_Traits>(0))
+-    { return __detail::__char_traits_cmp_cat<_Traits>(__x.compare(__y)); }
+-
+-  template<typename _CharT, typename _Traits>
+-    constexpr auto
+-    operator<=>(basic_string_view<_CharT, _Traits> __x,
+-		__type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
+-    -> decltype(__detail::__char_traits_cmp_cat<_Traits>(0))
+-    { return __detail::__char_traits_cmp_cat<_Traits>(__x.compare(__y)); }
+-#else
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator==(__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator==(__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return __x.size() == __y.size() && __x.compare(__y) == 0; }
+ 
+@@ -573,13 +493,12 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator!=(basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return !(__x == __y); }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator!=(__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator!=(__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return !(__x == __y); }
+ 
+@@ -592,13 +511,12 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator< (basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return __x.compare(__y) < 0; }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator< (__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator< (__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return __x.compare(__y) < 0; }
+ 
+@@ -611,13 +529,12 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator> (basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return __x.compare(__y) > 0; }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator> (__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator> (__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return __x.compare(__y) > 0; }
+ 
+@@ -630,13 +547,12 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator<=(basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return __x.compare(__y) <= 0; }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator<=(__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator<=(__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return __x.compare(__y) <= 0; }
+ 
+@@ -649,16 +565,14 @@
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+     operator>=(basic_string_view<_CharT, _Traits> __x,
+-               __type_identity_t<basic_string_view<_CharT, _Traits>> __y)
+-    noexcept
++               __detail::__idt<basic_string_view<_CharT, _Traits>> __y) noexcept
+     { return __x.compare(__y) >= 0; }
+ 
+   template<typename _CharT, typename _Traits>
+     constexpr bool
+-    operator>=(__type_identity_t<basic_string_view<_CharT, _Traits>> __x,
++    operator>=(__detail::__idt<basic_string_view<_CharT, _Traits>> __x,
+                basic_string_view<_CharT, _Traits> __y) noexcept
+     { return __x.compare(__y) >= 0; }
+-#endif // three-way comparison
+ 
+   // [string.view.io], Inserters and extractors
+   template<typename _CharT, typename _Traits>
+@@ -791,20 +705,6 @@
+   } // namespace string_literals
+   } // namespace literals
+ 
+-#if __cpp_lib_concepts
+-  namespace ranges
+-  {
+-    // Opt-in to borrowed_range concept
+-    template<typename _CharT, typename _Traits>
+-      inline constexpr bool
+-	enable_borrowed_range<basic_string_view<_CharT, _Traits>> = true;
+-
+-    // Opt-in to view concept
+-    template<typename _CharT, typename _Traits>
+-      inline constexpr bool
+-	enable_view<basic_string_view<_CharT, _Traits>> = true;
+-  }
+-#endif
+ _GLIBCXX_END_NAMESPACE_VERSION
+ } // namespace std
+ 

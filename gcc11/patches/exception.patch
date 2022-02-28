@@ -1,0 +1,11 @@
+--- a/libstdc++-v3/libsupc++/exception	2021-07-28 15:55:09.332315000 +0900
++++ b/libstdc++-v3/libsupc++/exception	2021-04-08 20:56:30.397768000 +0900
+@@ -111,7 +111,7 @@
+   int uncaught_exceptions() _GLIBCXX_USE_NOEXCEPT __attribute__ ((__pure__));
+ #endif
+ 
+-  /// @} group exceptions
++  // @} group exceptions
+ } // namespace std
+ 
+ namespace __gnu_cxx

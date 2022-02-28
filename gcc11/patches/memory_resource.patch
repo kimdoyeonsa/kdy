@@ -1,0 +1,50 @@
+--- a/libstdc++-v3/src/c++17/memory_resource.cc	2021-07-28 15:55:09.336315000 +0900
++++ b/libstdc++-v3/src/c++17/memory_resource.cc	2021-06-01 16:53:06.880501000 +0900
+@@ -89,8 +89,8 @@
+ 	~constant_init() { /* do nothing, union member is not destroyed */ }
+       };
+ 
+-    __constinit constant_init<newdel_res_t> newdel_res{};
+-    __constinit constant_init<null_res_t> null_res{};
++    constant_init<newdel_res_t> newdel_res{};
++    constant_init<null_res_t> null_res{};
+ #if ATOMIC_POINTER_LOCK_FREE == 2
+     using atomic_mem_res = atomic<memory_resource*>;
+ # define _GLIBCXX_ATOMIC_MEM_RES_CAN_BE_CONSTANT_INITIALIZED
+@@ -143,7 +143,7 @@
+ #endif // ATOMIC_POINTER_LOCK_FREE == 2
+ 
+ #ifdef _GLIBCXX_ATOMIC_MEM_RES_CAN_BE_CONSTANT_INITIALIZED
+-    __constinit constant_init<atomic_mem_res> default_res{&newdel_res.obj};
++    constant_init<atomic_mem_res> default_res{&newdel_res.obj};
+ #else
+ # include "default_resource.h"
+ #endif
+@@ -236,7 +236,7 @@
+       __size = aligned_ceil(__size + sizeof(_Chunk), 64);
+ 
+       // Check for unsigned wraparound
+-      if (__size < __orig_size) [[unlikely]]
++      if (__size < __orig_size) //[[unlikely]]
+ 	{
+ 	  // monotonic_buffer_resource::do_allocate is not allowed to throw.
+ 	  // If the required size is too large for size_t then ask the
+@@ -591,7 +591,7 @@
+     : _M_size(alloc_size(bytes), alignment)
+     {
+       // Check for unsigned wraparound
+-      if (size() < bytes) [[unlikely]]
++      if (size() < bytes) //[[unlikely]]
+ 	{
+ 	  // (sync|unsync)_pool_resource::do_allocate is not allowed to throw.
+ 	  // If the required size is too large for size_t then ask the
+@@ -605,7 +605,7 @@
+ 
+     size_t size() const noexcept
+     {
+-      if (_M_size.value == size_t(-1)) [[unlikely]]
++      if (_M_size.value == size_t(-1)) //[[unlikely]]
+ 	return size_t(-1);
+       return _M_size.size();
+     }
+

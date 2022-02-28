@@ -1,0 +1,65 @@
+commit 331735a357a73c7b8adc205241ac3cc6543d985e
+Author: Felix Fietkau <nbd@openwrt.org>
+Date:   Tue Nov 17 12:38:22 2015 +0000
+
+    gcc: add a patch to 5.x that supports translation of __FILE__ paths
+    
+    Signed-off-by: Felix Fietkau <nbd@openwrt.org>
+    
+    SVN-Revision: 47490
+
+Forward ported from attachment to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=47047
+--- a/gcc/c-family/c.opt
++++ b/gcc/c-family/c.opt
+@@ -2134,6 +2134,10 @@ iquote
+ C ObjC C++ ObjC++ Joined Separate MissingArgError(missing path after %qs)
+ -iquote <dir>	Add <dir> to the end of the quote include path.
+ 
++iremap
++C ObjC C++ ObjC++ Joined Separate
++-iremap <src:dst>  Convert <src> to <dst> if it occurs as prefix in __FILE__.
++
+ iwithprefix
+ C ObjC C++ ObjC++ Joined Separate
+ -iwithprefix <dir>	Add <dir> to the end of the system include path.
+--- a/gcc/doc/cpp.texi
++++ b/gcc/doc/cpp.texi
+@@ -4485,6 +4485,7 @@ Refer to the GCC manual for full documen
+ @c man begin SYNOPSIS
+ cpp [@option{-D}@var{macro}[=@var{defn}]@dots{}] [@option{-U}@var{macro}]
+     [@option{-I}@var{dir}@dots{}] [@option{-iquote}@var{dir}@dots{}]
++    [@option{-iremap}@var{src}:@var{dst}]
+     [@option{-M}|@option{-MM}] [@option{-MG}] [@option{-MF} @var{filename}]
+     [@option{-MP}] [@option{-MQ} @var{target}@dots{}]
+     [@option{-MT} @var{target}@dots{}]
+--- a/gcc/doc/cppopts.texi
++++ b/gcc/doc/cppopts.texi
+@@ -226,6 +226,12 @@ extensions @samp{.i}, @samp{.ii} or @sam
+ extensions that GCC uses for preprocessed files created by
+ @option{-save-temps}.
+ 
++@item -iremap @var{src}:@var{dst}
++@opindex iremap
++Replace the prefix @var{src} in __FILE__ with @var{dst} at expansion time.
++This option can be specified more than once.  Processing stops at the first
++match.
++
+ @item -fdirectives-only
+ @opindex fdirectives-only
+ When preprocessing, handle directives, but do not expand macros.
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -15950,6 +15950,12 @@ by @option{-fplugin=@var{name}} instead
+ @option{-fplugin=@var{path}/@var{name}.so}.  This option is not meant
+ to be used by the user, but only passed by the driver.
+ 
++@item -iremap @var{src}:@var{dst}
++@opindex iremap
++Replace the prefix @var{src} in __FILE__ with @var{dst} at expansion time.
++This option can be specified more than once.  Processing stops at the first
++match.
++
+ @item -L@var{dir}
+ @opindex L
+ Add directory @var{dir} to the list of directories to be searched
+

@@ -1,0 +1,15 @@
+--- a/c++tools/Makefile.in	2021-07-28 15:55:06.616277000 +0900
++++ b/c++tools/Makefile.in	2022-02-27 12:33:49.661665047 +0900
+@@ -119,10 +119,10 @@
+ 	$(SHELL) ./config.status Makefile
+ 
+ $(srcdir)/configure: $(srcdir)/configure.ac
+-	$(call MAINTAINER,$@,cd $(@D) && $(AUTOCONF) -W all,error)
++	$(call MAINTAINER,$@,cd $(@D) && $(AUTOCONF) -W all)
+ 
+ $(srcdir)/config.h.in: $(srcdir)/configure.ac
+-	$(call MAINTAINER,$@,cd $(@D) && $(AUTOHEADER) -f -W all,error)
++	$(call MAINTAINER,$@,cd $(@D) && $(AUTOHEADER) -f -W all)
+ 
+ config.h: config.status config.h.in
+ 	./$< --header=$@
