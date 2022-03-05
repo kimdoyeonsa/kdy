@@ -1,0 +1,37 @@
+--- a/class/class_abstract.h	2018-04-15 17:50:25.000000000 +0900
++++ b/class/class_abstract.h	2022-02-19 11:44:23.824622201 +0900
+@@ -12,7 +12,7 @@
+     object_handler.offset = XtOffsetOf(t_tf_##name##_object, std);
+ 
+ #define CA_OBJECT_CREATE(name, t_class, t_class_object, object_handler) \
+-    zend_object* tf_##name##_object_create(zend_class_entry *ce TSRMLS_DC) { \
++    zend_object* tf_##name##_object_create(zend_class_entry *ce) { \
+         t_class_object* intern; \
+         t_class *node = NULL; \
+         intern = (t_class_object *)ecalloc(1, sizeof(t_class_object)); \
+@@ -23,14 +23,14 @@
+             node->ref = 1; \
+         } \
+         intern->ptr = node; \
+-        zend_object_std_init(&intern->std, ce TSRMLS_CC); \
++        zend_object_std_init(&intern->std, ce); \
+         object_properties_init(&intern->std, ce); \
+         intern->std.handlers = &object_handler; \
+         return &intern->std; \
+     }
+ 
+ #define CA_OBJECT_FREE(name, t_class, t_class_object) \
+-    static void tf_##name##_object_free(zend_object *object TSRMLS_DC) { \
++    static void tf_##name##_object_free(zend_object *object) { \
+         t_class_object* intern = (t_class_object*)((char *)object - XtOffsetOf(t_class_object, std)); \
+         t_class* node = intern->ptr; \
+         node->ref--; \
+@@ -40,7 +40,7 @@
+             } \
+             efree(node); \
+         } \
+-        zend_object_std_dtor(&intern->std TSRMLS_CC); \
++        zend_object_std_dtor(&intern->std); \
+     }
+ 
+ 

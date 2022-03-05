@@ -1,0 +1,11 @@
+--- a/class/tf_status.c	2018-04-15 17:50:25.000000000 +0900
++++ b/class/tf_status.c	2022-02-19 11:47:15.713242516 +0900
+@@ -80,7 +80,7 @@
+     int code;
+     char* message = NULL;
+     size_t message_len;
+-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l|s", &code, &message, &message_len) == FAILURE) {
++    if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|s", &code, &message, &message_len) == FAILURE) {
+         RETURN_NULL();
+         return;
+     }
