@@ -8,9 +8,9 @@ include $(TOPDIR)/rules.mk
 PECL_NAME:=swoole
 PECL_LONGNAME:=swoole
 
-PKG_VERSION:=4.8.6
+PKG_VERSION:=4.8.7
 PKG_RELEASE:=1
-PKG_HASH:=e28b7c2d7a567233260f77bf133ad834cc6a50f3eea50424bf689b2e46685b1b
+PKG_HASH:=ca888cb886c883092ebe8788253d600bc52c384e74e27110f97b04ecea6b6fda
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -29,20 +29,24 @@ include ../../php81/pecl.mk
 CONFIGURE_ARGS+= \
 --enable-debug-log=no \
 --enable-trace-log=no \
+--enable-debug=yes \
 --enable-sockets=yes \
 --enable-openssl=yes \
 --enable-http2=yes \
 --enable-swoole=yes \
 --enable-mysqlnd=yes \
---enable-cares=no \
+--enable-cares=yes \
 --with-openssl-dir=$(STAGING_DIR)/opt/include \
 --with-jemalloc-dir=no \
---enable-asan=yes \
+--enable-asan=no \
 --enable-swoole-coverage=yes \
+--enable-swoole-curl=yes \
 --enable-swoole-dev=no \
 --enable-swoole-json=yes \
 --enable-swoole-curl=yes \
---enable-thread-context=yes
+--enable-thread-context=yes \
+--enable-swoole-pgsql=yes \
+--enable-swoole-coro-time=yes
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libstdcpp +libopenssl,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libstdcpp +libopenssl +libasan +libcares +libatomic,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
