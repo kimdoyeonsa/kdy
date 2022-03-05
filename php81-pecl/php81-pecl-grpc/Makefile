@@ -8,9 +8,9 @@ include $(TOPDIR)/rules.mk
 PECL_NAME:=grpc
 PECL_LONGNAME:=grpc
 
-PKG_VERSION:=1.43.0
+PKG_VERSION:=1.44.0
 PKG_RELEASE:=1
-PKG_HASH:=f4b41a6398666221fa03f7e01d2591b4b0e32aaf1aeca52810e6ef0c4a16d055
+PKG_HASH:=f6d6be7e1bd49b3aae7ada97233fe68172100a71a23e5039acb2c0c1b87e4f11
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -40,12 +40,6 @@ define Package/grpc-h
   CATEGORY:=Languages
   TITLE:=grpc-h
 endef
-
-define Package/grpc-h/install
-	$(INSTALL_DIR) $(1)/opt/include/grpc
-	$(CP)	$(PKG_BUILD_DIR)/include/grpc/grpc.h $(1)/opt/include/grpc
-endef
-
 	
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libstdcpp +grpc-h,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
