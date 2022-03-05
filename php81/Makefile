@@ -78,7 +78,7 @@ endef
 define Package/php81
   $(call Package/php81/Default)
 
-  DEPENDS:=+libpcre2 +libtidy +zlib +bzip2 +libedit +libncursesw +unixodbc \
+  DEPENDS:=+libpcre2 +libtidy +zlib +bzip2 +libedit +libncursesw \
            +php81_LIBXML:libxml2 \
            +php81_LIBXSL:libxslt \
            +php81_SYSTEMTZDATA:zoneinfo-core
