@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=php
-PKG_VERSION:=8.1.2
+PKG_VERSION:=8.1.3
 PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
@@ -16,7 +16,7 @@ PKG_CPE_ID:=cpe:/a:php:php
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=http://www.php.net/distributions/
-PKG_HASH:=6b448242fd360c1a9f265b7263abf3da25d28f2b2b0f5465533b69be51a391dd
+PKG_HASH:=5d65a11071b47669c17452fb336c290b67c101efb745c1dbe7525b5caf546ec6
 
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
@@ -78,7 +78,7 @@ endef
 define Package/php81
   $(call Package/php81/Default)
 
-  DEPENDS:=+libpcre2 +libtidy +zlib +bzip2 +libedit +libncursesw \
+  DEPENDS:=+libpcre2 +libtidy +zlib +bzip2 +libedit +libncursesw +unixodbc \
            +php81_LIBXML:libxml2 \
            +php81_LIBXSL:libxslt \
            +php81_SYSTEMTZDATA:zoneinfo-core
@@ -96,7 +96,7 @@ endef
 
 define Package/php81-dev
   $(call Package/php81/Default)
-  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma +libfreetds
+  DEPENDS+= +libaspell +libcurl +uw-imap +libstdcpp +libenchant2 +libexslt +libffi +libgd-full +libgmp +libnetsnmp +libpam +libpq +libopenldap +libsasl2 +libsodium +libsqlite3 +libzip +oniguruma +libfreetds +unixodbc
   TITLE+= (dev)
 endef
 
@@ -203,10 +203,8 @@ CONFIGURE_ARGS+= \
 	--with-pic \
 	--disable-rpath \
 	--disable-debug \
-	--enable-json=shared \
 	--with-libedit \
 	--enable-phpdbg \
-	--enable-phpdbg-webhelper \
 	--enable-phpdbg-debug \
 	--enable-phpdbg-readline=yes \
 	--enable-litespeed \
@@ -433,12 +431,16 @@ endif
   else
     CONFIGURE_ARGS+= --without-pdo-sqlite
   endif
-  
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-pgsql),)
   CONFIGURE_ARGS+= --with-pgsql=shared,"$(STAGING_DIR)/opt"
 else
   CONFIGURE_ARGS+= --without-pgsql
 endif  
+ ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-odbc),)
+    CONFIGURE_ARGS+= --with-unixODBC=shared,$(STAGING_DIR)/opt 
+  else
+    CONFIGURE_ARGS+= --without-unixODBC
+  endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php81-mod-xsl),)
   CONFIGURE_ARGS+= --with-xsl=shared,"$(STAGING_DIR)/opt/lib"
@@ -811,6 +813,7 @@ $(eval $(call BuildModule,pdo-dblib,PDO driver for FreeTDS,+php81-mod-pdo +PACKA
 $(eval $(call BuildModule,pdo-pgsql,PDO driver for PostgreSQL,+php81-mod-pdo +PACKAGE_php81-mod-pdo-pgsql:libpq))
 $(eval $(call BuildModule,pdo-sqlite,PDO driver for SQLite 3.x,+php81-mod-pdo +PACKAGE_php81-mod-pdo-sqlite:libsqlite3 +PACKAGE_php81-mod-pdo-sqlite:librt))
 $(eval $(call BuildModule,pgsql,PostgreSQL,+PACKAGE_php81-mod-pgsql:libpq))
+$(eval $(call BuildModule,odbc,ODBC,+PACKAGE_php81-mod-odbc:unixodbc))
 $(eval $(call BuildModule,phar,Phar Archives))
 $(eval $(call BuildModule,session,Session))
 $(eval $(call BuildModule,shmop,Shared Memory))
