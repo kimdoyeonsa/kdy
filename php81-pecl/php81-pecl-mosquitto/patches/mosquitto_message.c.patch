@@ -1,0 +1,225 @@
+--- a/mosquitto_message.c	2019-04-30 19:43:58.000000000 +0900
++++ b/mosquitto_message.c	2022-03-08 23:09:47.796869227 +0900
+@@ -18,7 +18,7 @@
+ typedef size_t mosquitto_strlen_type;
+ #else
+ # ifndef Z_OBJ_P
+-#  define Z_OBJ_P(pzv) ((zend_object*)zend_object_store_get_object(pzv TSRMLS_CC))
++#  define Z_OBJ_P(pzv) ((zend_object*)zend_object_store_get_object(pzv))
+ # endif
+ typedef int mosquitto_strlen_type;
+ #endif
+@@ -34,6 +34,13 @@
+ 	ZEND_ARG_INFO(0, topic)
+ ZEND_END_ARG_INFO()
+ 
++ZEND_BEGIN_ARG_INFO(Mosquitto_Message__construct, ZEND_SEND_BY_VAL)
++	ZEND_ARG_INFO(0, topic)
++	ZEND_ARG_INFO(0, payload)
++	ZEND_ARG_INFO(0, mid)
++	ZEND_ARG_INFO(0, qos)
++	ZEND_ARG_INFO(0, retain)
++ZEND_END_ARG_INFO()
+ /* }}} */
+ 
+ PHP_METHOD(Mosquitto_Message, __construct)
+@@ -54,7 +61,7 @@
+ 	zend_bool result;
+ 
+ 	PHP_MOSQUITTO_ERROR_HANDLING();
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss",
++	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ss",
+ 				&topic, &topic_len, &subscription, &subscription_len) == FAILURE) {
+ 		PHP_MOSQUITTO_RESTORE_ERRORS();
+ 		return;
+@@ -73,7 +80,7 @@
+ 	mosquitto_strlen_type topic_len = 0, retval = 0, count = 0, i = 0;
+ 
+ 	PHP_MOSQUITTO_ERROR_HANDLING();
+-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &topic, &topic_len) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &topic, &topic_len) == FAILURE) {
+ 		PHP_MOSQUITTO_RESTORE_ERRORS();
+ 		return;
+ 	}
+@@ -82,7 +89,7 @@
+ 	retval = mosquitto_sub_topic_tokenise(topic, &topics, (int*)&count);
+ 
+ 	if (retval == MOSQ_ERR_NOMEM) {
+-		zend_throw_exception_ex(mosquitto_ce_exception, 0 TSRMLS_CC, "Failed to tokenise topic");
++		zend_throw_exception_ex(mosquitto_ce_exception, 0, "Failed to tokenise topic");
+ 		return;
+ 	}
+ 
+@@ -130,14 +137,14 @@
+ 	return SUCCESS;
+ }
+ #else
+-static int php_mosquitto_message_read_retain(mosquitto_message_object *mosquitto_object, zval **retval TSRMLS_DC)
++static int php_mosquitto_message_read_retain(mosquitto_message_object *mosquitto_object, zval **retval)
+ {
+ 	MAKE_STD_ZVAL(*retval);
+ 	ZVAL_BOOL(*retval, mosquitto_object->message.retain);
+ 	return SUCCESS;
+ }
+ 
+-static int php_mosquitto_message_read_topic(mosquitto_message_object *mosquitto_object, zval **retval TSRMLS_DC)
++static int php_mosquitto_message_read_topic(mosquitto_message_object *mosquitto_object, zval **retval)
+ {
+ 	MAKE_STD_ZVAL(*retval);
+ 
+@@ -150,7 +157,7 @@
+ 	return SUCCESS;
+ }
+ 
+-static int php_mosquitto_message_read_payload(mosquitto_message_object *mosquitto_object, zval **retval TSRMLS_DC)
++static int php_mosquitto_message_read_payload(mosquitto_message_object *mosquitto_object, zval **retval)
+ {
+ 	MAKE_STD_ZVAL(*retval);
+ 	ZVAL_STRINGL(*retval, mosquitto_object->message.payload, mosquitto_object->message.payloadlen, 1);
+@@ -161,14 +168,14 @@
+ PHP_MOSQUITTO_MESSAGE_LONG_PROPERTY_WRITER_FUNCTION(mid);
+ PHP_MOSQUITTO_MESSAGE_LONG_PROPERTY_WRITER_FUNCTION(qos);
+ 
+-static int php_mosquitto_message_write_retain(mosquitto_message_object *mosquitto_object, zval *newval TSRMLS_DC)
++static int php_mosquitto_message_write_retain(mosquitto_message_object *mosquitto_object, zval *newval)
+ {
+ 	mosquitto_object->message.retain = zend_is_true(newval);
+ 
+ 	return SUCCESS;
+ }
+ 
+-static int php_mosquitto_message_write_topic(mosquitto_message_object *mosquitto_object, zval *newval TSRMLS_DC)
++static int php_mosquitto_message_write_topic(mosquitto_message_object *mosquitto_object, zval *newval)
+ {
+ 	zval ztmp;
+ 	if (Z_TYPE_P(newval) != IS_STRING) {
+@@ -192,7 +199,7 @@
+ 	return SUCCESS;
+ }
+ 
+-static int php_mosquitto_message_write_payload(mosquitto_message_object *mosquitto_object, zval *newval TSRMLS_DC)
++static int php_mosquitto_message_write_payload(mosquitto_message_object *mosquitto_object, zval *newval)
+ {
+ 	zval ztmp;
+ 	if (Z_TYPE_P(newval) != IS_STRING) {
+@@ -243,12 +250,12 @@
+ 	return (php_mosquitto_prop_handler*)Z_PTR_P(ret);
+ }
+ #else
+-# define READ_PROPERTY_DC ZEND_LITERAL_KEY_DC TSRMLS_DC
+-# define READ_PROPERTY_CC ZEND_LITERAL_KEY_CC TSRMLS_CC
+-# define WRITE_PROPERTY_DC ZEND_LITERAL_KEY_DC TSRMLS_DC
+-# define WRITE_PROPERTY_CC ZEND_LITERAL_KEY_CC TSRMLS_CC
+-# define HAS_PROPERTY_DC ZEND_LITERAL_KEY_DC TSRMLS_DC
+-# define HAS_PROPERTY_CC ZEND_LITERAL_KEY_CC TSRMLS_CC
++# define READ_PROPERTY_DC ZEND_LITERAL_KEY_DC
++# define READ_PROPERTY_CC ZEND_LITERAL_KEY_CC
++# define WRITE_PROPERTY_DC ZEND_LITERAL_KEY_DC
++# define WRITE_PROPERTY_CC ZEND_LITERAL_KEY_CC
++# define HAS_PROPERTY_DC ZEND_LITERAL_KEY_DC
++# define HAS_PROPERTY_CC ZEND_LITERAL_KEY_CC
+ 
+ static php_mosquitto_prop_handler *mosquitto_get_prop_handler(zval *prop) {
+ 	php_mosquitto_prop_handler *hnd;
+@@ -281,7 +288,7 @@
+ 			ZVAL_NULL(retval);
+ 		}
+ #else
+-		if (SUCCESS == hnd->read_func(message_object, &retval TSRMLS_CC)) {
++		if (SUCCESS == hnd->read_func(message_object, &retval)) {
+ 			/* ensure we're creating a temporary variable */
+ 			Z_SET_REFCOUNT_P(retval, 0);
+ 		} else {
+@@ -316,7 +323,7 @@
+ 	hnd = mosquitto_get_prop_handler(member);
+ 
+ 	if (hnd && hnd->write_func) {
+-		hnd->write_func(obj, value TSRMLS_CC);
++		hnd->write_func(obj, value);
+ #ifdef ZEND_ENGINE_3
+ 		if (Z_REFCOUNTED_P(value)) {
+ 			Z_ADDREF_P(value);
+@@ -415,7 +422,7 @@
+ # endif
+ #endif
+ 
+-static HashTable *php_mosquitto_message_get_properties(zval *object TSRMLS_DC)
++static HashTable *php_mosquitto_message_get_properties(zval *object)
+ {
+ 	mosquitto_message_object *obj = mosquitto_message_object_from_zend_object(Z_OBJ_P(object));
+ 	php_mosquitto_prop_handler *hnd;
+@@ -429,7 +436,7 @@
+ 	ulong num_key;
+ #endif
+ 
+-	props = zend_std_get_properties(object TSRMLS_CC);
++	props = zend_std_get_properties(object);
+ 
+ 	ZEND_HASH_FOREACH_KEY_PTR(&php_mosquitto_message_properties, num_key, key, hnd) {
+ #ifdef ZEND_ENGINE_3
+@@ -444,7 +451,7 @@
+ 		}
+ #else
+ 		zval *val;
+-		if (!hnd->read_func || hnd->read_func(obj, &val TSRMLS_CC) != SUCCESS) {
++		if (!hnd->read_func || hnd->read_func(obj, &val) != SUCCESS) {
+ 			val = EG(uninitialized_zval_ptr);
+ 			Z_ADDREF_P(val);
+ 		}
+@@ -460,7 +467,7 @@
+ }
+ 
+ 
+-void php_mosquitto_message_add_property(HashTable *h, const char *name, size_t name_length, php_mosquitto_read_t read_func, php_mosquitto_write_t write_func TSRMLS_DC)
++void php_mosquitto_message_add_property(HashTable *h, const char *name, size_t name_length, php_mosquitto_read_t read_func, php_mosquitto_write_t write_func)
+ {
+ #ifdef ZEND_ENGINE_3
+ 	php_mosquitto_prop_handler *p = (php_mosquitto_prop_handler*)pemalloc(sizeof(php_mosquitto_prop_handler), 1);
+@@ -484,7 +491,7 @@
+ #endif
+ }
+ 
+-static void mosquitto_message_object_destroy(zend_object *object TSRMLS_DC)
++static void mosquitto_message_object_destroy(zend_object *object)
+ {
+ 	mosquitto_message_object *message = mosquitto_message_object_from_zend_object(object);
+ #ifdef ZEND_ENGINE_3
+@@ -521,7 +528,7 @@
+ 	return ret;
+ }
+ #else
+-static zend_object_value mosquitto_message_object_new(zend_class_entry *ce TSRMLS_DC) {
++static zend_object_value mosquitto_message_object_new(zend_class_entry *ce) {
+ 
+ 	zend_object_value retval;
+ 	mosquitto_message_object *message_obj;
+@@ -543,16 +550,16 @@
+ #else
+ 	object_properties_init(&message_obj->std, mosquitto_ce_message);
+ #endif
+-	retval.handle = zend_objects_store_put(message_obj, NULL, (zend_objects_free_object_storage_t) mosquitto_message_object_destroy, NULL TSRMLS_CC);
++	retval.handle = zend_objects_store_put(message_obj, NULL, (zend_objects_free_object_storage_t) mosquitto_message_object_destroy, NULL);
+ 	retval.handlers = &mosquitto_message_object_handlers;
+ 	return retval;
+ }
+ #endif
+ 
+ const zend_function_entry mosquitto_message_methods[] = {
+-	PHP_ME(Mosquitto_Message, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+-	PHP_ME(Mosquitto_Message, topicMatchesSub, Mosquitto_Message_topicMatchesSub_args, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+-	PHP_ME(Mosquitto_Message, tokeniseTopic, Mosquitto_Message_tokeniseTopic_args, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
++	PHP_ME(Mosquitto_Message, __construct, Mosquitto_Message__construct, ZEND_ACC_PUBLIC)
++	PHP_ME(Mosquitto_Message, topicMatchesSub, Mosquitto_Message_topicMatchesSub_args, ZEND_ACC_PUBLIC)
++	PHP_ME(Mosquitto_Message, tokeniseTopic, Mosquitto_Message_tokeniseTopic_args, ZEND_ACC_PUBLIC)
+ 	PHP_FE_END
+ };
+ 
+@@ -570,7 +577,7 @@
+ #endif
+ 
+ 	INIT_NS_CLASS_ENTRY(message_ce, "Mosquitto", "Message", mosquitto_message_methods);
+-	mosquitto_ce_message = zend_register_internal_class(&message_ce TSRMLS_CC);
++	mosquitto_ce_message = zend_register_internal_class(&message_ce);
+ 	mosquitto_ce_message->create_object = mosquitto_message_object_new;
+ 
+ 	zend_hash_init(&php_mosquitto_message_properties, 0, NULL, NULL, 1);

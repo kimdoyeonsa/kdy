@@ -1,0 +1,63 @@
+--- a/php_mosquitto.h	2019-04-30 19:43:58.000000000 +0900
++++ b/php_mosquitto.h	2022-03-07 23:04:20.958144119 +0900
+@@ -113,9 +113,9 @@
+ #ifdef ZEND_ENGINE_3
+ typedef int (*php_mosquitto_read_t)(mosquitto_message_object *mosquitto_object, zval *retval);
+ #else
+-typedef int (*php_mosquitto_read_t)(mosquitto_message_object *mosquitto_object, zval **retval TSRMLS_DC);
++typedef int (*php_mosquitto_read_t)(mosquitto_message_object *mosquitto_object, zval **retval);
+ #endif
+-typedef int (*php_mosquitto_write_t)(mosquitto_message_object *mosquitto_object, zval *newval TSRMLS_DC);
++typedef int (*php_mosquitto_write_t)(mosquitto_message_object *mosquitto_object, zval *newval);
+ 
+ typedef struct _php_mosquitto_prop_handler {
+ 	const char *name;
+@@ -126,10 +126,10 @@
+ 
+ 
+ #define PHP_MOSQUITTO_ERROR_HANDLING() \
+-	zend_replace_error_handling(EH_THROW, mosquitto_ce_exception, &MQTTG(mosquitto_original_error_handling) TSRMLS_CC)
++	zend_replace_error_handling(EH_THROW, mosquitto_ce_exception, &MQTTG(mosquitto_original_error_handling))
+ 
+ #define PHP_MOSQUITTO_RESTORE_ERRORS() \
+-	zend_restore_error_handling(&MQTTG(mosquitto_original_error_handling) TSRMLS_CC)
++	zend_restore_error_handling(&MQTTG(mosquitto_original_error_handling))
+ 
+ #ifdef ZEND_ENGINE_3
+ # define PHP_MOSQUITTO_FREE_CALLBACK(client, CALLBACK) \
+@@ -165,7 +165,7 @@
+ 	int i = 0; \
+ 	while (b[i].name != NULL) { \
+ 		php_mosquitto_message_add_property((a), (b)[i].name, (b)[i].name_length, \
+-							(php_mosquitto_read_t)(b)[i].read_func, (php_mosquitto_write_t)(b)[i].write_func TSRMLS_CC); \
++							(php_mosquitto_read_t)(b)[i].read_func, (php_mosquitto_write_t)(b)[i].write_func); \
+ 		i++; \
+ 	} \
+ }
+@@ -178,7 +178,7 @@
+ 	}
+ #else
+ # define PHP_MOSQUITTO_MESSAGE_LONG_PROPERTY_READER_FUNCTION(name) \
+-	static int php_mosquitto_message_read_##name(mosquitto_message_object *mosquitto_object, zval **retval TSRMLS_DC) { \
++	static int php_mosquitto_message_read_##name(mosquitto_message_object *mosquitto_object, zval **retval) { \
+ 		MAKE_STD_ZVAL(*retval); \
+ 		ZVAL_LONG(*retval, mosquitto_object->message.name); \
+ 		return SUCCESS; \
+@@ -186,7 +186,7 @@
+ #endif
+ 
+ #define PHP_MOSQUITTO_MESSAGE_LONG_PROPERTY_WRITER_FUNCTION(name) \
+-static int php_mosquitto_message_write_##name(mosquitto_message_object *mosquitto_object, zval *newval TSRMLS_DC) \
++static int php_mosquitto_message_write_##name(mosquitto_message_object *mosquitto_object, zval *newval) \
+ { \
+ 	zval ztmp; \
+ 	if (Z_TYPE_P(newval) != IS_LONG) { \
+@@ -233,7 +233,7 @@
+ PHP_MOSQUITTO_API void php_mosquitto_disconnect_callback(struct mosquitto *mosq, void *obj, int rc);
+ 
+ PHP_MOSQUITTO_API char *php_mosquitto_strerror_wrapper(int err);
+-void php_mosquitto_handle_errno(int retval, int err TSRMLS_DC);
++void php_mosquitto_handle_errno(int retval, int err);
+ void php_mosquitto_exit_loop(mosquitto_client_object *object);
+ 
+ PHP_MINIT_FUNCTION(mosquitto);
