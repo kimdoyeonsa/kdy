@@ -1,0 +1,25 @@
+--- a/configure	2022-03-09 14:42:45.851204000 +0900
++++ b/configure	2022-03-09 14:45:27.835558107 +0900
+@@ -3374,22 +3374,8 @@
+   else
+     if test "$cross_compiling" = maybe; then
+ 	cross_compiling=yes
+-    else
+-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+-as_fn_error $? "cannot run C compiled programs.
+-If you meant to cross compile, use \`--host'.
+-See \`config.log' for more details" "$LINENO" 5; }
+-    fi
+   fi
+ fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cross_compiling" >&5
+-$as_echo "$cross_compiling" >&6; }
+-
+-rm -f conftest.$ac_ext conftest$ac_cv_exeext conftest.out
+-ac_clean_files=$ac_clean_files_save
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for suffix of object files" >&5
+-$as_echo_n "checking for suffix of object files... " >&6; }
+ if ${ac_cv_objext+:} false; then :
+   $as_echo_n "(cached) " >&6
+ else
