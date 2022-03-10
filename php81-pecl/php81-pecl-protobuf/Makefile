@@ -26,5 +26,8 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
+CONFIGURE_ARGS+= \
+--enable-protobuf
+
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
 $(eval $(call BuildPackage,$(PKG_NAME)))
