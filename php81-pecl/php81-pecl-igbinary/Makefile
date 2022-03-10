@@ -33,25 +33,11 @@ CONFIGURE_ARGS+= \
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/opt/include/ext/igbinary
 	$(CP)	$(PKG_BUILD_DIR)/igbinary.h $(1)/opt/include/ext/igbinary
+	$(INSTALL_DIR) $(1)/opt/include/php81/ext/igbinary
+	$(CP)	$(PKG_BUILD_DIR)/igbinary.h $(1)/opt/include/php81/ext/igbinary
 	$(INSTALL_DIR) $(1)/opt/include/src/php7
-	$(CP)	$(PKG_BUILD_DIR)/src/php7/igbinary.h $(1)/opt/include/src/php7
+	$(CP)	$(PKG_BUILD_DIR)/src/php7/* $(1)/opt/include/src/php7
 endef
 
-define Package/igbinary-h
- SUBMENU:=PHP81
-  SECTION:=lang
-  CATEGORY:=Languages
-  TITLE:=igbinary-h
-endef
-
-define Package/igbinary-h/install
-	$(INSTALL_DIR) $(1)/opt/include/ext/igbinary
-	$(CP)	$(PKG_BUILD_DIR)/igbinary.h $(1)/opt/include/ext/igbinary
-	$(INSTALL_DIR) $(1)/opt/include/src/php7
-	$(CP)	$(PKG_BUILD_DIR)/src/php7/igbinary.h $(1)/opt/include/src/php7
-endef
-
-
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+igbinary-h))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME)))
 $(eval $(call BuildPackage,$(PKG_NAME)))
-$(eval $(call BuildPackage,igbinary-h))
