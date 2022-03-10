@@ -32,12 +32,11 @@
  ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_assign, 0, 0, 2)
  	ZEND_ARG_INFO(0, name)
  	ZEND_ARG_INFO(0, value)
-@@ -54,6 +57,10 @@
+@@ -54,6 +57,9 @@
  	ZEND_ARG_INFO(0, file)
  ZEND_END_ARG_INFO()
  
-+ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_version, 0, 0, 1)
-+	ZEND_ARG_INFO(0, getversion)
++ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_version, 0, 0, 0)
 +ZEND_END_ARG_INFO()
 +
  ZEND_BEGIN_ARG_INFO_EX(arginfo_lua_eval, 0, 0, 1)
