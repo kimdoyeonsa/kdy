@@ -27,20 +27,19 @@ include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
 CONFIGURE_VARS+= \
-PHP_MEMCACHED_IGBINARY=yes \
-PHP_MEMCACHED_MSGPACK=yes
+phpincludedir=$(STAGING_DIR)/opt
 
 CONFIGURE_ARGS+= \
       --enable-memcached \
       --with-libmemcached-dir=$(STAGING_DIR)/opt \
       --enable-memcached-session=yes \
-      --enable-memcached-igbinary=no \
+      --enable-memcached-igbinary=yes \
       --enable-memcached-json=yes \
-      --enable-memcached-msgpack=no \
+      --enable-memcached-msgpack=yes \
       --enable-memcached-sasl=yes \
       --enable-memcached-protocol=yes \
       --with-system-fastlz=yes \
       --with-zlib-dir=$(STAGING_DIR)/opt
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+memcached +libmemcached +zlib +zlib-dev +libfastlz +igbinary-h +libsasl2,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+memcached +libmemcached +zlib +zlib-dev +libfastlz +libsasl2 +php81-pecl-igbinary +php81-pecl-msgpack,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
