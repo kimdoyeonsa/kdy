@@ -176,8 +176,10 @@ endef
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/opt/include
-	$(CP) $(PKG_INSTALL_DIR)/opt/include/* $(1)/opt/include
+	cp -ar $(PKG_INSTALL_DIR)/opt/include/* $(1)/opt/include
+	cp -ar $(TOOLCHAIN_DIR)/include/* $(1)/opt/include
 endef
+
 
 ENVCFLAGS:="$(TARGET_OPTIMIZATION) $(EXTRA_OPTIMIZATION)
 ifeq ($(CONFIG_SOFT_FLOAT),y)
