@@ -18,7 +18,7 @@
  ZEND_API void zend_user_it_rewind(zend_object_iterator *_iter);
  ZEND_API zend_result zend_user_it_valid(zend_object_iterator *_iter);
  ZEND_API void zend_user_it_get_current_key(zend_object_iterator *_iter, zval *key);
-@@ -64,6 +75,9 @@
+@@ -65,6 +76,9 @@
  ZEND_API int zend_user_serialize(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data);
  ZEND_API int zend_user_unserialize(zval *object, zend_class_entry *ce, const unsigned char *buf, size_t buf_len, zend_unserialize_data *data);
  
