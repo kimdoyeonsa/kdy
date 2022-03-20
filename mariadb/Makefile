@@ -75,6 +75,10 @@ MARIADB_SERVER_PLUGINS := \
 	handlersocket \
 	locales \
 	metadata_lock_info \
+	mypluglib \
+	qa_auth_client \
+	qa_auth_interface \
+	qa_auth_server \
 	query_cache_info \
 	query_response_time \
 	server_audit \
@@ -85,7 +89,8 @@ MARIADB_SERVER_PLUGINS := \
 	provider_lz4 \
 	provider_lzo \
 	provider_lzma \
-	provider_snappy 
+	provider_snappy \
+	zstd
 	
 
 PKG_CONFIG_DEPENDS := \
@@ -113,6 +118,10 @@ plugin-ha_spider                := PLUGIN_SPIDER
 plugin-handlersocket            := PLUGIN_HANDLERSOCKET
 plugin-locales                  := PLUGIN_LOCALES
 plugin-metadata_lock_info       := PLUGIN_METADATA_LOCK_INFO
+plugin-mypluglib 		 :=PLUGIN_MYPLUGLIB
+plugin-qa_auth_client         := PLUGIN_QA_AUTH_CLIENT
+plugin-qa_auth_interface         := PLUGIN_QA_AUTH_INTERFACE
+plugin-qa_auth_server         := PLUGIN_QA_AUTH_SERVER
 plugin-query_cache_info         := PLUGIN_QUERY_CACHE_INFO
 plugin-query_response_time      := PLUGIN_QUERY_RESPONSE_TIME
 plugin-server_audit             := PLUGIN_SERVER_AUDIT
@@ -124,6 +133,7 @@ plugin-provider_lz4 		 :=PLUGIN_PROVIDER_LZ4
 plugin-provider_lzo 		 :=PLUGIN_PROVIDER_LZO
 plugin-provider_lzma 		 :=PLUGIN_PROVIDER_LZMA
 plugin-provider_snappy 		 :=PLUGIN_PROVIDER_SNAPPY
+plugin-zstd 		 :=PLUGIN_ZSTD
 
 MARIADB_CLIENT := \
 	mysql \
@@ -390,7 +400,7 @@ CMAKE_OPTIONS += \
 	-DWITH_INNODB_LZMA=ON \
 	-DWITH_INNODB_LZO=ON \
 	-DWITH_INNODB_SNAPPY=ON \
-	-DWITH_JEMALLOC=OFF \
+	-DWITH_JEMALLOC=ON \
 	-DWITH_LIBARCHIVE=OFF \
 	-DWITH_LIBWRAP=OFF \
 	-DWITH_MARIABACKUP=ON \
@@ -600,10 +610,15 @@ $(eval $(call BuildPlugin,ha_sphinx,))
 $(eval $(call BuildPlugin,ha_spider,))
 $(eval $(call BuildPlugin,handlersocket,))
 $(eval $(call BuildPlugin,locales,))
+$(eval $(call BuildPlugin,mypluglib,))
 $(eval $(call BuildPlugin,metadata_lock_info,))
+$(eval $(call BuildPlugin,qa_auth_client,))
+$(eval $(call BuildPlugin,qa_auth_interface,))
+$(eval $(call BuildPlugin,qa_auth_server,))
 $(eval $(call BuildPlugin,query_cache_info,))
 $(eval $(call BuildPlugin,query_response_time,))
 $(eval $(call BuildPlugin,server_audit,))
 $(eval $(call BuildPlugin,simple_password_check,))
 $(eval $(call BuildPlugin,sql_errlog,))
+$(eval $(call BuildPlugin,zstd,+libzstd))
 $(eval $(call BuildPlugin,wsrep_info,))
