@@ -16,6 +16,9 @@ PKG_LICENSE_FILES:=COPYING
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
+CMAKE_OPTIONS+= \
+-DOPENCV_GENERATE_PKGCONFIG=ON
+
 define Package/opencv
   SECTION:=utils
   CATEGORY:=Utilities
@@ -37,9 +40,11 @@ endef
 
 define Build/InstallDev
 	$(INSTALL_DIR)	$(1)/opt/include
-	$(CP) $(PKG_INSTALL_DIR)/opt/include/*		$(1)/opt/include/
+	$(CP) $(PKG_INSTALL_DIR)/opt/include/opencv4/opencv2	$(1)/opt/include/
 	$(INSTALL_DIR)	$(1)/opt/lib
 	$(CP) $(PKG_INSTALL_DIR)/opt/lib/libopencv*.so*	$(1)/opt/lib/
+	$(INSTALL_DIR)	$(1)/opt/lib/pkgconfig
+	$(CP) $(PKG_INSTALL_DIR)/opt/lib/pkgconfig/opencv4.pc	$(1)/opt/lib/pkgconfig
 endef
 
 define Package/opencv/install
