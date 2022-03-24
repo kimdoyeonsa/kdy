@@ -27,8 +27,11 @@ include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
 include ../../php81/pecl.mk
 
+CONFIGURE_ARGS+= \
+--with-opencv=$(STAGING_DIR)/opt
+
 CONFIGURE_VARS+= \
 HAVE_OPENCV=1
-	
+
 $(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libstdcpp +opencv +libopencv,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
