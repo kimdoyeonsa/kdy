@@ -8,9 +8,9 @@ include $(TOPDIR)/rules.mk
 PECL_NAME:=mongodb
 PECL_LONGNAME:=mongodb
 
-PKG_VERSION:=1.12.1
+PKG_VERSION:=1.13.0
 PKG_RELEASE:=1
-PKG_HASH:=925d7e6005c6e84bb40a25019c12b0ee4bda625c6449769dce7d5b026983f433
+PKG_HASH:=22865b61d264c90c9eaa85d94f2f5f57e564140cad87c8c2601fa33f80efe0bb
 
 PKG_NAME:=php81-pecl-$(PECL_NAME)
 PKG_SOURCE:=$(PECL_NAME)-$(PKG_VERSION).tgz
@@ -28,7 +28,11 @@ include ../../php81/pecl.mk
 
 CONFIGURE_ARGS+= \
 --enable-mongodb \
---enable-mongodb-coverage=yes
+--enable-mongodb-coverage=yes \
+--with-libmongoc=yes \
+--with-libbson=yes \
+--with-mongodb-system-libs=yes \
+--with-mongodb-client-side-encryption=yes
 
-$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libsasl2 +libsasl2-sasldb +icu +libopenssl +libzstd +libsnappy,30))
+$(eval $(call PHP81PECLPackage,$(PECL_NAME),$(PECL_LONGNAME),+libbson +mongo-c-driver +libmongocrypt +libkms_message,30))
 $(eval $(call BuildPackage,$(PKG_NAME)))
